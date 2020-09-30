@@ -5,6 +5,7 @@ import com.deepak.assignment2.Exception.UserValidationException;
 import com.deepak.assignment2.model.User;
 import com.deepak.assignment2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,9 @@ public class UserHandler {
      * @throws UserException
      */
     @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user) throws UserException, UserValidationException {
+    public ResponseEntity<User> createUser(@RequestBody User user) throws UserException, UserValidationException {
         User u = userService.createUser(validatedUser(user));
-        return ResponseEntity.ok(u);
+        return ResponseEntity.status(HttpStatus.CREATED).body(u);
     }
 
     /**
@@ -60,9 +61,10 @@ public class UserHandler {
      * @throws UserException
      */
     @PutMapping("/v1/user/self")
-    public ResponseEntity<User> putUser(@RequestHeader("Authorization") String value, @RequestBody User user) throws UserException, UserValidationException {
+    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody User user) throws UserException {
 
-        return ResponseEntity.ok(userService.putUser(extractEmailFromHeader(value), validatedUser(user)));
+        userService.putUser(extractEmailFromHeader(value), validatedUser(user));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -70,9 +72,9 @@ public class UserHandler {
      *
      * @param user
      * @return Valid User Object
-     * @throws UserValidationException
+     * @throws UserException
      */
-    private User validatedUser(User user) throws UserValidationException {
+    private User validatedUser(User user) throws UserException {
         if (null != user) {
             String firstName = user.getFirst_name();
             String email = user.getEmail();
@@ -83,34 +85,28 @@ public class UserHandler {
             String emailRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
             if (null != email) {
                 if (!Pattern.matches(emailRegex, email)) {
-                    throw new UserValidationException("invalid email");
+                    throw new UserException("invalid email");
                 }
             }
             if (null != password) {
                 if (!Pattern.matches(passwordRegex, password)) {
-                    throw new UserValidationException("Password should be between 8 & 255 character! may or may not contain numbers and special characters ");
+                    throw new UserException("Password should be between 8 & 255 character! may or may not contain numbers and special characters ");
                 }
             if (null != firstName) {
-                if (firstName.length() < 1 || firstName.length() > 255) {
-                    throw new UserValidationException("firstname of user cannot be empty or greater than 255");
-                }
                 if ( !Pattern.matches(nameRegex, firstName) ) {
-                    throw new UserValidationException("invalid firstname");
+                    throw new UserException("invalid firstname");
                 }
             }
             if (null != lastName) {
-                if (lastName.length() < 1 || lastName.length() > 255) {
-                    throw new UserValidationException("lastName of user cannot be empty or greater than 255");
-                }
                 if (!Pattern.matches(nameRegex, lastName) ) {
-                    throw new UserValidationException("invalid lastName");
+                    throw new UserException("invalid lastName");
                 }
             }
 
             }
             return user;
         } else
-            throw new UserValidationException("Invalid User Object Provided");
+            throw new UserException("Invalid User Object Provided");
     }
 
     /**

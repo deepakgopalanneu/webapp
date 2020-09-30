@@ -25,14 +25,14 @@ public class UserService {
      */
     public User createUser(User user) throws UserException {
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setAccount_created(LocalDateTime.now().toString());
-        user.setAccount_updated(LocalDateTime.now().toString());
-
         try {
             User userExistsForUpdatedEmail = getUser(user.getEmail());
             if(null != userExistsForUpdatedEmail)
                 throw new UserException("Conflict - Email address already in use");
+
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setAccount_created(LocalDateTime.now().toString());
+            user.setAccount_updated(LocalDateTime.now().toString());
             return userRepo.save(user);
         } catch (Exception e) {
             throw new UserException(e.getMessage());
@@ -62,21 +62,13 @@ public class UserService {
     /**
      * @param email Valid Email address
      * @param user  Value to be updated
-     * @return
+     * @return updated user object
      * @throws UserException
      */
     public User putUser(String email, User user) throws UserException {
         User userExistsForUpdatedEmail =null;
         if (!email.equals(user.getEmail())) {
-            try{
-                userExistsForUpdatedEmail = getUser(user.getEmail());
-                if(null != userExistsForUpdatedEmail)
-                    throw new UserException("Conflict - Email address already in use");
-
-            }
-            catch (Exception ex){
-                throw new UserException(ex.getMessage());
-            }
+            throw new UserException("Not allowed to update Email field");
         }
         try{
             userExistsForUpdatedEmail = getUser(email);
@@ -85,7 +77,6 @@ public class UserService {
                 userExistsForUpdatedEmail.setAccount_updated(LocalDateTime.now().toString());
                 userExistsForUpdatedEmail.setLast_name(user.getLast_name());
                 userExistsForUpdatedEmail.setFirst_name(user.getFirst_name());
-                userExistsForUpdatedEmail.setEmail(user.getEmail());
             }else{
                 userExistsForUpdatedEmail = user;
             }
