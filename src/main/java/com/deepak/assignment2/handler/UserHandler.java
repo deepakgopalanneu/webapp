@@ -74,14 +74,14 @@ public class UserHandler {
      * @return Valid User Object
      * @throws UserException
      */
-    private User validatedUser(User user) throws UserException {
+    public static User validatedUser(User user) throws UserException {
         if (null != user) {
             String firstName = user.getFirst_name();
             String email = user.getEmail();
             String lastName = user.getLast_name();
             String password = user.getPassword();
             String passwordRegex = "^(?=.*?[a-zA-Z0-9#?!@$%^&*-]).{8,255}$";
-            String nameRegex = "^(?=.{1,40}$)[a-zA-Z]+(?:[-'\\s][a-zA-Z]+)*$";
+            String nameRegex = "^(?=.{1,60}$)[a-zA-Z]+(?:[-'\\s][a-zA-Z]+)*$";
             String emailRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
             if (null != email) {
                 if (!Pattern.matches(emailRegex, email)) {
@@ -113,7 +113,7 @@ public class UserHandler {
      * @param value
      * @return String email address decoded from the Authorization header
      */
-    private String extractEmailFromHeader(String value) {
+    public static String extractEmailFromHeader(String value) {
 
         String credentials = value.split(" ")[1];
         String decodedCredentials = new String(Base64.getDecoder().decode(credentials));

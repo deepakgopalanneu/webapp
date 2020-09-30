@@ -27,7 +27,7 @@ public class UserService {
 
         try {
             User userExistsForUpdatedEmail = getUser(user.getEmail());
-            if(null != userExistsForUpdatedEmail)
+            if (null != userExistsForUpdatedEmail)
                 throw new UserException("Conflict - Email address already in use");
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -66,23 +66,23 @@ public class UserService {
      * @throws UserException
      */
     public User putUser(String email, User user) throws UserException {
-        User userExistsForUpdatedEmail =null;
+        User userExistsForUpdatedEmail = null;
         if (!email.equals(user.getEmail())) {
             throw new UserException("Not allowed to update Email field");
         }
-        try{
+        try {
             userExistsForUpdatedEmail = getUser(email);
-            if(null!= userExistsForUpdatedEmail) {
+            if (null != userExistsForUpdatedEmail) {
                 userExistsForUpdatedEmail.setPassword(passwordEncoder.encode(user.getPassword()));
                 userExistsForUpdatedEmail.setAccount_updated(LocalDateTime.now().toString());
                 userExistsForUpdatedEmail.setLast_name(user.getLast_name());
                 userExistsForUpdatedEmail.setFirst_name(user.getFirst_name());
-            }else{
+            } else {
                 userExistsForUpdatedEmail = user;
             }
             return userRepo.save(userExistsForUpdatedEmail);
-            } catch (Exception ex){
-                throw new UserException(ex.getMessage());
-            }
+        } catch (Exception ex) {
+            throw new UserException(ex.getMessage());
+        }
     }
 }
