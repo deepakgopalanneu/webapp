@@ -4,6 +4,7 @@ import com.deepak.assignment2.Exception.UserException;
 import com.deepak.assignment2.handler.UserHandler;
 import com.deepak.assignment2.model.User;
 import com.deepak.assignment2.service.UserService;
+import com.deepak.assignment2.testpackage.SpringSecurityWebAuxTestConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = SpringSecurityWebAuxTestConfig.class
+)
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Assignment2ApplicationTests {
