@@ -84,7 +84,7 @@ public class UserHandler {
      * @throws UserException
      */
     @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody @Valid User user) throws UserException {
+    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user) throws UserException {
         User u = userService.createUser(validatedUser(user));
         return ResponseEntity.status(HttpStatus.CREATED).body(u);
     }
@@ -112,7 +112,7 @@ public class UserHandler {
      * @throws UserException
      */
     @PutMapping("/v1/user/self")
-    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody User user) throws UserException {
+    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody  @NotNull @Valid User user) throws UserException {
 
         userService.putUser(extractEmailFromHeader(value), validatedUser(user));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
