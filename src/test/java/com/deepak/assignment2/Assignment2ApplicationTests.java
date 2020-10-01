@@ -41,26 +41,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Assignment2ApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private UserService userService;
-
-    private User user;
     private final String id = "ff80818174d7e84e0174d7eaf6c50";
     private final String fname = "someFirstName";
     private final String lname = "somelastName";
     private final String email = "csye6225@northeastern.edu";
     private final String password = "somecrazypassword";
     private final String header = "Basic Y3N5ZTYyMjVAbm9ydGhlYXN0ZXJuLmVkdTpzb21lY3JhenlwYXNzd29yZA==";
+    @Autowired
+    private MockMvc mockMvc;
+    @MockBean
+    private UserService userService;
+    private User user;
+
+    @Test
+    void contextLoads() {
+    }
 
     @BeforeAll
-    public void init(){
+    public void init() {
         user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
@@ -134,74 +132,67 @@ class Assignment2ApplicationTests {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isNoContent());
     }
+
+
     @Test
-    public void extractEmailFromHeaderShouldDecodeCredentials(){
+    public void extractEmailFromHeaderShouldDecodeCredentials() {
 
         assertTrue(UserHandler.extractEmailFromHeader(header).equals(email));
 
     }
+
     @Test
     public void validatedUserShouldValidateFirstName() throws UserException {
         user.setFirst_name("");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
         user.setFirst_name("abc123");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
         user.setFirst_name("abc!@");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
     }
+
     @Test
-    public void validatedUserShouldValidateLastName(){
+    public void validatedUserShouldValidateLastName() {
         user.setLast_name("");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
         user.setLast_name("abc123");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
         user.setLast_name("abc!@");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
-    }
-    @Test
-    public void validatedUserShouldValidateEmail(){
-        user.setEmail("email");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
-        user.setEmail("deepak.com");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
-        user.setEmail("deepak@com");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
 
     }
+
     @Test
-    public void validatedUserShouldValidatePassword(){
+    public void validatedUserShouldValidateEmail() {
+        user.setEmail("email");
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
+        user.setEmail("deepak.com");
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
+        user.setEmail("deepak@com");
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
+
+    }
+
+    @Test
+    public void validatedUserShouldValidatePassword() {
         user.setPassword("");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
         user.setPassword("1234567");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
         byte[] array = new byte[256]; // length is bounded by 7
         new Random().nextBytes(array);
-        user.setPassword (new String(array, Charset.forName("UTF-8")));
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        user.setPassword(new String(array, Charset.forName("UTF-8")));
+        assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
+
     }
 
 

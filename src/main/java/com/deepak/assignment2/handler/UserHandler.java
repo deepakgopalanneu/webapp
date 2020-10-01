@@ -1,7 +1,6 @@
 package com.deepak.assignment2.handler;
 
 import com.deepak.assignment2.Exception.UserException;
-import com.deepak.assignment2.Exception.UserValidationException;
 import com.deepak.assignment2.model.User;
 import com.deepak.assignment2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Base64;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
@@ -23,48 +21,6 @@ public class UserHandler {
     @Autowired
     public UserHandler(UserService service) {
         this.userService = service;
-    }
-
-    /**
-     * This method validates the input and persists in the Database
-     *
-     * @param user RequestBody should contain a valid User Object
-     * @return ResponseEntity with Body of type User
-     * @throws UserException
-     */
-    @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody User user) throws UserException, UserValidationException {
-        User u = userService.createUser(validatedUser(user));
-        return ResponseEntity.status(HttpStatus.CREATED).body(u);
-    }
-
-    /**
-     * This method analyzes the user and returns corresponding resource as response
-     *
-     * @param value is the Basic Authorization String sent by Consumer
-     * @return ResponseEntity with Body of type User
-     * @throws UserException
-     */
-    @GetMapping("/v1/user/self")
-    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value) throws UserException {
-        User u = userService.getUser(extractEmailFromHeader(value));
-        if(null!= u)
-            return ResponseEntity.ok(u);
-        else
-            throw new UserException("User Not Found");
-    }
-
-    /**
-     * @param value is the Basic Authorization String sent by Consumer
-     * @param user  RequestBody should contain a valid User Object
-     * @return ResponseEntity with Body of type User
-     * @throws UserException
-     */
-    @PutMapping("/v1/user/self")
-    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody User user) throws UserException {
-
-        userService.putUser(extractEmailFromHeader(value), validatedUser(user));
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -92,16 +48,16 @@ public class UserHandler {
                 if (!Pattern.matches(passwordRegex, password)) {
                     throw new UserException("Password should be between 8 & 255 character! may or may not contain numbers and special characters ");
                 }
-            if (null != firstName) {
-                if ( !Pattern.matches(nameRegex, firstName) ) {
-                    throw new UserException("invalid firstname");
+                if (null != firstName) {
+                    if (!Pattern.matches(nameRegex, firstName)) {
+                        throw new UserException("invalid firstname");
+                    }
                 }
-            }
-            if (null != lastName) {
-                if (!Pattern.matches(nameRegex, lastName) ) {
-                    throw new UserException("invalid lastName");
+                if (null != lastName) {
+                    if (!Pattern.matches(nameRegex, lastName)) {
+                        throw new UserException("invalid lastName");
+                    }
                 }
-            }
 
             }
             return user;
@@ -118,5 +74,47 @@ public class UserHandler {
         String credentials = value.split(" ")[1];
         String decodedCredentials = new String(Base64.getDecoder().decode(credentials));
         return decodedCredentials.split(":")[0];
+    }
+
+    /**
+     * This method validates the input and persists in the Database
+     *
+     * @param user RequestBody should contain a valid User Object
+     * @return ResponseEntity with Body of type User
+     * @throws UserException
+     */
+    @PostMapping("/v1/user")
+    public ResponseEntity<User> createUser(@RequestBody User user) throws UserException {
+        User u = userService.createUser(validatedUser(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(u);
+    }
+
+    /**
+     * This method analyzes the user and returns corresponding resource as response
+     *
+     * @param value is the Basic Authorization String sent by Consumer
+     * @return ResponseEntity with Body of type User
+     * @throws UserException
+     */
+    @GetMapping("/v1/user/self")
+    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value) throws UserException {
+        User u = userService.getUser(extractEmailFromHeader(value));
+        if (null != u)
+            return ResponseEntity.ok(u);
+        else
+            throw new UserException("User Not Found");
+    }
+
+    /**
+     * @param value is the Basic Authorization String sent by Consumer
+     * @param user  RequestBody should contain a valid User Object
+     * @return ResponseEntity with Body of type User
+     * @throws UserException
+     */
+    @PutMapping("/v1/user/self")
+    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody User user) throws UserException {
+
+        userService.putUser(extractEmailFromHeader(value), validatedUser(user));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
