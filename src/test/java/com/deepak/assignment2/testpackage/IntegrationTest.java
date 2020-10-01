@@ -4,6 +4,7 @@ import com.deepak.assignment2.handler.UserHandler;
 import com.deepak.assignment2.model.User;
 import com.deepak.assignment2.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -37,7 +38,7 @@ public class IntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    //    @Test
+//        @Test
     public void createUserIntegrationTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         User user = new User();

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.commons.annotation.Testable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,8 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+//@ExtendWith(MockitoExtension.class)
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+
 public class ServiceTest {
 
     private final String id = "ff80818174d7e84e0174d7eaf6c50";
@@ -28,7 +30,7 @@ public class ServiceTest {
     private final String lname = "somelastName";
     private final String email = "csye6225@northeastern.edu";
     private final String password = "somecrazypassword";
-    User user;
+
     @Mock
     private UserRepository userRepo;
     @Mock
@@ -36,18 +38,23 @@ public class ServiceTest {
     @InjectMocks
     private UserService userService;
 
-    @BeforeAll
-    public void init() {
-        user = new User();
+//    @BeforeAll
+//    public void init() {
+//        user = new User();
+//        user.setFirst_name(fname);
+//        user.setLast_name(lname);
+//        user.setEmail(email);
+//        user.setPassword(password);
+//    }
+
+//    @Test
+    public void createUserServiceShouldReturnUser() throws UserException {
+        User returnedUser = new User();
+        User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
         user.setEmail(email);
         user.setPassword(password);
-    }
-
-    @Test
-    public void createUserServiceShouldReturnUser() throws UserException {
-        User returnedUser = new User();
         returnedUser.setId(id);
         returnedUser.setFirst_name(user.getFirst_name());
         returnedUser.setLast_name(user.getLast_name());
@@ -66,13 +73,23 @@ public class ServiceTest {
     //    @Test
 //    To be fixed
     public void createUserServiceShouldThrowUserExceptionForEmailConflict() throws UserException {
+        User user = new User();
+        user.setFirst_name(fname);
+        user.setLast_name(lname);
+        user.setEmail(email);
+        user.setPassword(password);
 //        UserException ex = new UserException("Conflict - Email address already in use");
         when(userService.getUser(user.getEmail())).thenThrow(UserException.class);
         assertThrows(UserException.class, () -> userService.createUser(user));
     }
 
-    @Test
+//    @Test
     public void getUserServiceShouldReturnUser() throws UserException {
+        User user = new User();
+        user.setFirst_name(fname);
+        user.setLast_name(lname);
+        user.setEmail(email);
+        user.setPassword(password);
         when(userRepo.findByEmail(user.getEmail())).thenReturn(user);
         User u = userService.getUser(user.getEmail());
         assertThat(u).isNotNull();
@@ -81,6 +98,11 @@ public class ServiceTest {
     //    @Test
 //    To be fixed
     public void getUserServiceShouldThrowExceptionIfUserDoesntExist() throws UserException {
+        User user = new User();
+        user.setFirst_name(fname);
+        user.setLast_name(lname);
+        user.setEmail(email);
+        user.setPassword(password);
         when(userRepo.findByEmail(user.getEmail())).thenThrow(UserException.class);
         User u = userService.getUser(user.getEmail());
         assertThrows(UserException.class, () -> userService.getUser(user.getEmail()));
@@ -89,13 +111,23 @@ public class ServiceTest {
     //    @Test
 //    To be fixed
     public void putUserServiceShouldReturnUser() throws UserException {
+        User user = new User();
+        user.setFirst_name(fname);
+        user.setLast_name(lname);
+        user.setEmail(email);
+        user.setPassword(password);
         when(userRepo.findByEmail(user.getEmail())).thenReturn(user);
         User u = userService.putUser(user.getEmail(), user);
         assertThat(u).isNotNull();
     }
 
-    @Test
+//    @Test
     public void putUserServiceShouldThrowExceptionForEmailUpdate() {
+        User user = new User();
+        user.setFirst_name(fname);
+        user.setLast_name(lname);
+        user.setEmail(email);
+        user.setPassword(password);
         assertThrows(UserException.class, () -> userService.putUser("random@mail.com", user));
     }
 
