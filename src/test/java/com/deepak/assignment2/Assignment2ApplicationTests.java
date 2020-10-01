@@ -1,6 +1,7 @@
 package com.deepak.assignment2;
 
 import com.deepak.assignment2.Exception.UserException;
+import com.deepak.assignment2.Exception.UserValidationException;
 import com.deepak.assignment2.handler.UserHandler;
 import com.deepak.assignment2.model.User;
 import com.deepak.assignment2.service.UserService;
@@ -50,6 +51,7 @@ class Assignment2ApplicationTests {
 
     @MockBean
     private UserService userService;
+
 
     private User user;
     private final String id = "ff80818174d7e84e0174d7eaf6c50";
@@ -134,6 +136,9 @@ class Assignment2ApplicationTests {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isNoContent());
     }
+
+
+
     @Test
     public void extractEmailFromHeaderShouldDecodeCredentials(){
 
@@ -143,66 +148,54 @@ class Assignment2ApplicationTests {
     @Test
     public void validatedUserShouldValidateFirstName() throws UserException {
         user.setFirst_name("");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         user.setFirst_name("abc123");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         user.setFirst_name("abc!@");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
     }
     @Test
     public void validatedUserShouldValidateLastName(){
         user.setLast_name("");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         user.setLast_name("abc123");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         user.setLast_name("abc!@");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
     }
     @Test
     public void validatedUserShouldValidateEmail(){
         user.setEmail("email");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         user.setEmail("deepak.com");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         user.setEmail("deepak@com");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
 
     }
     @Test
     public void validatedUserShouldValidatePassword(){
         user.setPassword("");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         user.setPassword("1234567");
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
         byte[] array = new byte[256]; // length is bounded by 7
         new Random().nextBytes(array);
         user.setPassword (new String(array, Charset.forName("UTF-8")));
-        assertThrows(UserException.class , () ->{
-            UserHandler.validatedUser(user);
-        });
+        assertThrows(UserException.class , () -> UserHandler.validatedUser(user));
+
     }
+
 
 
 }

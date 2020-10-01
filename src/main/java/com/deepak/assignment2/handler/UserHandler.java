@@ -33,7 +33,7 @@ public class UserHandler {
      * @throws UserException
      */
     @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody User user) throws UserException, UserValidationException {
+    public ResponseEntity<User> createUser(@RequestBody User user) throws UserException {
         User u = userService.createUser(validatedUser(user));
         return ResponseEntity.status(HttpStatus.CREATED).body(u);
     }
