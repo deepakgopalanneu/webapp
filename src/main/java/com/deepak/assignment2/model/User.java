@@ -22,8 +22,11 @@ public class User {
     @NotNull
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String password;
+
+
+
     @NotNull
-    String email;
+    String username;
     @ReadOnlyProperty
     String account_created;
     @ReadOnlyProperty
@@ -53,13 +56,6 @@ public class User {
         this.last_name = last_name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getAccount_created() {
         return account_created;
@@ -77,6 +73,12 @@ public class User {
         this.account_updated = account_updated;
     }
 
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
     public String getPassword() {
         return password;
     }

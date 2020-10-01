@@ -79,7 +79,7 @@ class Assignment2ApplicationTests {
         User returnedUser = new User();
         returnedUser.setId(id);
         returnedUser.setFirst_name(user.getFirst_name());
-        returnedUser.setEmail(user.getEmail());
+        returnedUser.setUsername(user.getUsername());
         returnedUser.setPassword(user.getPassword());
         returnedUser.setLast_name(user.getLast_name());
         returnedUser.setAccount_created(LocalDateTime.now().toString());
@@ -96,7 +96,7 @@ class Assignment2ApplicationTests {
                 .andExpect(jsonPath("$.first_name").value(user.getFirst_name()))
                 .andExpect(jsonPath("$.last_name").value(user.getLast_name()))
                 .andExpect(jsonPath("$.id").value(returnedUser.getId()))
-                .andExpect(jsonPath("$.email").value(user.getEmail()))
+                .andExpect(jsonPath("$.email").value(user.getUsername()))
                 .andExpect(jsonPath("$.account_created").value(returnedUser.getAccount_created()))
                 .andExpect(jsonPath("$.account_updated").value(returnedUser.getAccount_updated()));
     }
@@ -118,7 +118,7 @@ class Assignment2ApplicationTests {
                 .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.first_name").value(user.getFirst_name()))
                 .andExpect(jsonPath("$.last_name").value(user.getLast_name()))
-                .andExpect(jsonPath("$.email").value(user.getEmail()))
+                .andExpect(jsonPath("$.email").value(user.getUsername()))
                 .andExpect(jsonPath("$.account_created").value(user.getAccount_created()))
                 .andExpect(jsonPath("$.account_updated").value(user.getAccount_updated()));
     }
@@ -151,7 +151,7 @@ class Assignment2ApplicationTests {
         user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
         user.setFirst_name("");
         assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
@@ -168,7 +168,7 @@ class Assignment2ApplicationTests {
         user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
         user.setLast_name("");
         assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
@@ -186,15 +186,15 @@ class Assignment2ApplicationTests {
                 user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
-        user.setEmail("email");
+        user.setUsername("email");
         assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
 
-        user.setEmail("deepak.com");
+        user.setUsername("deepak.com");
         assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
 
-        user.setEmail("deepak@com");
+        user.setUsername("deepak@com");
         assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
 
 
@@ -205,7 +205,7 @@ class Assignment2ApplicationTests {
         user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
         user.setPassword("");
         assertThrows(UserException.class, () -> UserHandler.validatedUser(user));
