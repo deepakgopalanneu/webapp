@@ -11,6 +11,7 @@ public class ControllerAdvise {
 
     /**
      * this method handles all UserException thrown
+     *
      * @param ex
      * @return ResponseEntity of type Error
      */

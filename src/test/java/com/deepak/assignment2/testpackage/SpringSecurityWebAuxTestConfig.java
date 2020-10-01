@@ -20,6 +20,6 @@ public class SpringSecurityWebAuxTestConfig {
         user.setPassword("somecrazypassword");
         UserPrincipal testUser = new UserPrincipal(user);
 
-        return new InMemoryUserDetailsManager( testUser);
+        return new InMemoryUserDetailsManager(testUser);
     }
 }
