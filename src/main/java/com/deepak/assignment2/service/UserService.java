@@ -26,7 +26,7 @@ public class UserService {
     public User createUser(User user) throws UserException {
 
         try {
-            User userExistsForUpdatedEmail = getUser(user.getEmail());
+            User userExistsForUpdatedEmail = getUser(user.getUsername());
             if (null != userExistsForUpdatedEmail)
                 throw new UserException("Conflict - Email address already in use");
 
@@ -49,7 +49,7 @@ public class UserService {
     public User getUser(String email) throws UserException {
 
         try {
-            User user = userRepo.findByEmail(email);
+            User user = userRepo.findByUsername(email);
             if (null != user)
                 return user;
             else
@@ -70,7 +70,7 @@ public class UserService {
             throw new UserException("Put Request should not contain account_updated or account_created fields");
         }
         User userExistsForUpdatedEmail = null;
-        if (!email.equals(user.getEmail())) {
+        if (!email.equals(user.getUsername())) {
             throw new UserException("Not allowed to update Email field");
         }
         try {

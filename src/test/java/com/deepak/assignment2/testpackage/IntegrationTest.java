@@ -44,7 +44,7 @@ public class IntegrationTest {
         User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
         this.mockMvc.perform(post("/v1/user")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -54,7 +54,7 @@ public class IntegrationTest {
                 .andExpect(jsonPath("$.first_name").value(user.getFirst_name()))
                 .andExpect(jsonPath("$.last_name").value(user.getLast_name()))
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.email").value(user.getEmail()))
+                .andExpect(jsonPath("$.email").value(user.getUsername()))
                 .andExpect(jsonPath("$.account_created").exists())
                 .andExpect(jsonPath("$.account_updated").exists());
     }

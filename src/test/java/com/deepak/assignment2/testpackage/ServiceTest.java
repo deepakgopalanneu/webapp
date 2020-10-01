@@ -53,12 +53,12 @@ public class ServiceTest {
         User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
         returnedUser.setId(id);
         returnedUser.setFirst_name(user.getFirst_name());
         returnedUser.setLast_name(user.getLast_name());
-        returnedUser.setEmail(user.getEmail());
+        returnedUser.setUsername(user.getUsername());
         returnedUser.setPassword(encoder.encode(user.getPassword()));
         returnedUser.setAccount_created(LocalDateTime.now().toString());
         returnedUser.setAccount_updated(LocalDateTime.now().toString());
@@ -76,10 +76,10 @@ public class ServiceTest {
         User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
 //        UserException ex = new UserException("Conflict - Email address already in use");
-        when(userService.getUser(user.getEmail())).thenThrow(UserException.class);
+        when(userService.getUser(user.getUsername())).thenThrow(UserException.class);
         assertThrows(UserException.class, () -> userService.createUser(user));
     }
 
@@ -88,10 +88,10 @@ public class ServiceTest {
         User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
-        when(userRepo.findByEmail(user.getEmail())).thenReturn(user);
-        User u = userService.getUser(user.getEmail());
+        when(userRepo.findByUsername(user.getUsername())).thenReturn(user);
+        User u = userService.getUser(user.getUsername());
         assertThat(u).isNotNull();
     }
 
@@ -101,11 +101,11 @@ public class ServiceTest {
         User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
-        when(userRepo.findByEmail(user.getEmail())).thenThrow(UserException.class);
-        User u = userService.getUser(user.getEmail());
-        assertThrows(UserException.class, () -> userService.getUser(user.getEmail()));
+        when(userRepo.findByUsername(user.getUsername())).thenThrow(UserException.class);
+        User u = userService.getUser(user.getUsername());
+        assertThrows(UserException.class, () -> userService.getUser(user.getUsername()));
     }
 
     //    @Test
@@ -114,10 +114,10 @@ public class ServiceTest {
         User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
-        when(userRepo.findByEmail(user.getEmail())).thenReturn(user);
-        User u = userService.putUser(user.getEmail(), user);
+        when(userRepo.findByUsername(user.getUsername())).thenReturn(user);
+        User u = userService.putUser(user.getUsername(), user);
         assertThat(u).isNotNull();
     }
 
@@ -126,7 +126,7 @@ public class ServiceTest {
         User user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
-        user.setEmail(email);
+        user.setUsername(email);
         user.setPassword(password);
         assertThrows(UserException.class, () -> userService.putUser("random@mail.com", user));
     }

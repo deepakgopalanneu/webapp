@@ -33,7 +33,7 @@ public class UserHandler {
     public static User validatedUser(User user) throws UserException {
         if (null != user) {
             String firstName = user.getFirst_name();
-            String email = user.getEmail();
+            String email = user.getUsername();
             String lastName = user.getLast_name();
             String password = user.getPassword();
             String passwordRegex = "^(?=.*?[a-zA-Z0-9#?!@$%^&*-]).{8,255}$";
@@ -84,7 +84,7 @@ public class UserHandler {
      * @throws UserException
      */
     @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody User user) throws UserException {
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user) throws UserException {
         User u = userService.createUser(validatedUser(user));
         return ResponseEntity.status(HttpStatus.CREATED).body(u);
     }

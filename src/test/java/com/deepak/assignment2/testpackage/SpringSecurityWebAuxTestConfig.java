@@ -16,7 +16,7 @@ public class SpringSecurityWebAuxTestConfig {
     @Primary
     public UserDetailsService userDetailsService() {
         User user = new User();
-        user.setEmail("csye6225@northeastern.edu");
+        user.setUsername("csye6225@northeastern.edu");
         user.setPassword("somecrazypassword");
         UserPrincipal testUser = new UserPrincipal(user);
 
