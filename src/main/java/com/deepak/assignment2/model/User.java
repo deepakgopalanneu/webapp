@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 @Entity
-//@UniqueConstraint(columnNames={"email"}))
 public class User {
     @Id
     @GeneratedValue(generator = "system-uuid")
