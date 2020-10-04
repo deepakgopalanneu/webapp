@@ -1,17 +1,11 @@
-package com.deepak.assignment2.testpackage;
+package com.deepak.project.testpackage;
 
-import com.deepak.assignment2.Exception.UserException;
-import com.deepak.assignment2.model.User;
-import com.deepak.assignment2.repository.UserRepository;
-import com.deepak.assignment2.service.UserService;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.annotation.Testable;
+import com.deepak.project.Exception.UserException;
+import com.deepak.project.model.User;
+import com.deepak.project.repository.UserRepository;
+import com.deepak.project.service.UserService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;

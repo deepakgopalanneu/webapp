@@ -14,5 +14,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11.0.4
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      - name: Build
+        run: mvn package -Dmaven.test.skip=true
+      - name: Run all Tests
+        run: mvn test

@@ -1,13 +1,14 @@
-package com.deepak.assignment2.service;
+package com.deepak.project.service;
 
-import com.deepak.assignment2.Exception.UserException;
-import com.deepak.assignment2.model.User;
-import com.deepak.assignment2.repository.UserRepository;
+import com.deepak.project.Exception.UserException;
+import com.deepak.project.model.User;
+import com.deepak.project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -86,6 +87,18 @@ public class UserService {
             return userRepo.save(userExistsForUpdatedEmail);
         } catch (Exception ex) {
             throw new UserException(ex.getMessage());
+        }
+    }
+
+    public User getUnknownUser(String id) throws UserException {
+        try {
+            Optional<User> optional = userRepo.findById(id);
+            if(optional.isPresent())
+                return optional.get();
+            else
+                throw new UserException("User Not found");
+        }catch (Exception e){
+            throw new UserException(e.getMessage());
         }
     }
 }

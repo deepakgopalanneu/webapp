@@ -1,6 +1,6 @@
-package com.deepak.assignment2.model;
+package com.deepak.project.model;
 
-import com.deepak.assignment2.repository.UserRepository;
+import com.deepak.project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +21,8 @@ public class MyUserDetailsService implements UserDetailsService {
         if (null == user) {
             throw new UsernameNotFoundException("User not found for the given email address");
         } else {
-            return new UserPrincipal(user);
+            return new UserPrincipal(user.getId(),user.getFirst_name(),
+                    user.getLast_name(),user.getPassword(),user.getUsername());
         }
     }
 }

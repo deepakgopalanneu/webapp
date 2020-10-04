@@ -1,8 +1,8 @@
-package com.deepak.assignment2.handler;
+package com.deepak.project.handler;
 
-import com.deepak.assignment2.Exception.UserException;
-import com.deepak.assignment2.model.User;
-import com.deepak.assignment2.service.UserService;
+import com.deepak.project.Exception.UserException;
+import com.deepak.project.model.User;
+import com.deepak.project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -84,9 +84,9 @@ public class UserHandler {
      * @throws UserException
      */
     @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user) throws UserException {
-        User u = userService.createUser(validatedUser(user));
-        return ResponseEntity.status(HttpStatus.CREATED).body(u);
+    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user ) throws UserException {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(validatedUser(user)));
     }
 
     /**
@@ -97,7 +97,8 @@ public class UserHandler {
      * @throws UserException
      */
     @GetMapping("/v1/user/self")
-    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value) throws UserException {
+    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value ) throws UserException {
+
         User u = userService.getUser(extractEmailFromHeader(value));
         if (null != u)
             return ResponseEntity.ok(u);
@@ -116,5 +117,10 @@ public class UserHandler {
 
         userService.putUser(extractEmailFromHeader(value), validatedUser(user));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/v1/user/{id}")
+    public ResponseEntity<User> getUnknownUser(@PathVariable("id") @NotNull String id ) throws  UserException{
+        return ResponseEntity.ok(userService.getUnknownUser(id));
     }
 }

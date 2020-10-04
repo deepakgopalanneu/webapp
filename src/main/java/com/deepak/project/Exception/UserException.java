@@ -1,4 +1,4 @@
-package com.deepak.assignment2.Exception;
+package com.deepak.project.Exception;
 
 public class UserException extends Exception {
     public UserException(String message) {

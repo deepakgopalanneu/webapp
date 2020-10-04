@@ -1,9 +1,10 @@
-package com.deepak.assignment2.config;
+package com.deepak.project.config;
 
-import com.deepak.assignment2.model.MyUserDetailsService;
+import com.deepak.project.model.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,13 +15,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    @Autowired
-//    private AuthenticationEntryPoint authEntryPoint;
 
+    @Autowired
+    private DataSource datasource;
 
     @Autowired
     private MyUserDetailsService myUserDetailsService;
@@ -38,7 +41,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/v1/user").permitAll()
+                .antMatchers(HttpMethod.POST,"/v1/user").permitAll()
+                .antMatchers(HttpMethod.GET,"/v1/user/{id}").permitAll()
+                .antMatchers(HttpMethod.GET,"/v1/question/{question_id}/answer/{answer_id}").permitAll()
+                .antMatchers(HttpMethod.GET,"/v1/questions").permitAll()
+                .antMatchers(HttpMethod.GET,"/v1/questions/{questions_id}").permitAll()
+                .antMatchers(HttpMethod.GET,"/v1/user/{id}").permitAll()
+
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable()
@@ -56,6 +65,5 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder getEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
 }

@@ -1,31 +1,17 @@
-package com.deepak.assignment2;
+package com.deepak.project;
 
-import com.deepak.assignment2.Exception.UserException;
-import com.deepak.assignment2.handler.UserHandler;
-import com.deepak.assignment2.model.User;
-import com.deepak.assignment2.service.UserService;
-import com.deepak.assignment2.testpackage.SpringSecurityWebAuxTestConfig;
+import com.deepak.project.Exception.UserException;
+import com.deepak.project.handler.UserHandler;
+import com.deepak.project.model.User;
+import com.deepak.project.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.annotation.Testable;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,14 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@ExtendWith(MockitoExtension.class)
-//@SpringBootTest(
-//        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-//        classes = SpringSecurityWebAuxTestConfig.class
-//)
-//@AutoConfigureMockMvc
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@ActiveProfiles("test")
+
 @Testable
 class Assignment2ApplicationTests {
 

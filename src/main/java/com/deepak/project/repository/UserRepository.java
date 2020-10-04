@@ -1,6 +1,6 @@
-package com.deepak.assignment2.repository;
+package com.deepak.project.repository;
 
-import com.deepak.assignment2.model.User;
+import com.deepak.project.model.User;
 import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, String> {

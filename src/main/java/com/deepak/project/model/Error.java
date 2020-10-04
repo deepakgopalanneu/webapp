@@ -1,4 +1,4 @@
-package com.deepak.assignment2.model;
+package com.deepak.project.model;
 
 public class Error {
 

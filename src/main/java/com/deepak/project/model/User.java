@@ -1,4 +1,4 @@
-package com.deepak.assignment2.model;
+package com.deepak.project.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
@@ -14,23 +14,23 @@ public class User {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    String id;
+    private String id;
     @NotNull
-    String first_name;
+    private String first_name;
     @NotNull
-    String last_name;
+    private String last_name;
     @NotNull
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    String password;
+    private String password;
 
 
 
     @NotNull
-    String username;
+    private String username;
     @ReadOnlyProperty
-    String account_created;
+    private String account_created;
     @ReadOnlyProperty
-    String account_updated;
+    private String account_updated;
 
     public String getId() {
         return id;
