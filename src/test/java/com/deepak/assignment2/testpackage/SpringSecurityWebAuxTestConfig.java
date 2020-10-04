@@ -16,9 +16,13 @@ public class SpringSecurityWebAuxTestConfig {
     @Primary
     public UserDetailsService userDetailsService() {
         User user = new User();
+        user.setId("1234");
+        user.setFirst_name("Deepak");
+        user.setLast_name("Gopalan");
         user.setUsername("csye6225@northeastern.edu");
         user.setPassword("somecrazypassword");
-        UserPrincipal testUser = new UserPrincipal(user);
+        UserPrincipal testUser =  new UserPrincipal(user.getId(),user.getFirst_name(),
+                user.getLast_name(),user.getPassword(),user.getUsername());;
 
         return new InMemoryUserDetailsManager(testUser);
     }

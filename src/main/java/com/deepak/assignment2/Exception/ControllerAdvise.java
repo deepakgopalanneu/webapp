@@ -26,5 +26,16 @@ public class ControllerAdvise  extends ResponseEntityExceptionHandler{
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-
+    /**
+     * this method handles all QuestionException thrown
+     *
+     * @param ex
+     * @return ResponseEntity of type Error
+     */
+    @ExceptionHandler(QuestionException.class)
+    public ResponseEntity<Error> handleUserException(QuestionException ex) {
+        Error error = new Error();
+        error.setErrormessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 }

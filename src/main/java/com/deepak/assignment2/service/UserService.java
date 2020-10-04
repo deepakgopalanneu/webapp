@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -86,6 +87,18 @@ public class UserService {
             return userRepo.save(userExistsForUpdatedEmail);
         } catch (Exception ex) {
             throw new UserException(ex.getMessage());
+        }
+    }
+
+    public User getUnknownUser(String id) throws UserException {
+        try {
+            Optional<User> optional = userRepo.findById(id);
+            if(optional.isPresent())
+                return optional.get();
+            else
+                throw new UserException("User Not found");
+        }catch (Exception e){
+            throw new UserException(e.getMessage());
         }
     }
 }

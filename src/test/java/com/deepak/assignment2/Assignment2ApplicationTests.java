@@ -35,14 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@ExtendWith(MockitoExtension.class)
-//@SpringBootTest(
-//        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-//        classes = SpringSecurityWebAuxTestConfig.class
-//)
-//@AutoConfigureMockMvc
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@ActiveProfiles("test")
+
 @Testable
 class Assignment2ApplicationTests {
 

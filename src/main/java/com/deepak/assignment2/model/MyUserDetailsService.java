@@ -21,7 +21,8 @@ public class MyUserDetailsService implements UserDetailsService {
         if (null == user) {
             throw new UsernameNotFoundException("User not found for the given email address");
         } else {
-            return new UserPrincipal(user);
+            return new UserPrincipal(user.getId(),user.getFirst_name(),
+                    user.getLast_name(),user.getPassword(),user.getUsername());
         }
     }
 }

@@ -2,14 +2,17 @@ package com.deepak.assignment2.handler;
 
 import com.deepak.assignment2.Exception.UserException;
 import com.deepak.assignment2.model.User;
+import com.deepak.assignment2.model.UserPrincipal;
 import com.deepak.assignment2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.security.Principal;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
@@ -84,9 +87,9 @@ public class UserHandler {
      * @throws UserException
      */
     @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user) throws UserException {
-        User u = userService.createUser(validatedUser(user));
-        return ResponseEntity.status(HttpStatus.CREATED).body(u);
+    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user ) throws UserException {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(validatedUser(user)));
     }
 
     /**
@@ -97,7 +100,8 @@ public class UserHandler {
      * @throws UserException
      */
     @GetMapping("/v1/user/self")
-    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value) throws UserException {
+    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value ) throws UserException {
+
         User u = userService.getUser(extractEmailFromHeader(value));
         if (null != u)
             return ResponseEntity.ok(u);
@@ -116,5 +120,10 @@ public class UserHandler {
 
         userService.putUser(extractEmailFromHeader(value), validatedUser(user));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/v1/user/{id}")
+    public ResponseEntity<User> getUnknownUser(@PathVariable("id") @NotNull String id ) throws  UserException{
+        return ResponseEntity.ok(userService.getUnknownUser(id));
     }
 }
