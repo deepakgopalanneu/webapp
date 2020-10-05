@@ -14,16 +14,15 @@ public class UserPrincipal implements UserDetails {
     private String last_name;
     private String password;
     private String username;
-    private String account_created;
-    private String account_updated;
-    public UserPrincipal(String id,String first_name,String last_name, String password,
-                         String username ) {
+
+    public UserPrincipal(String id, String first_name, String last_name, String password,
+                         String username) {
         super();
         this.id = id;
-        this.first_name=first_name;
-        this.last_name=last_name;
-        this.username=username;
-        this.password=password;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.username = username;
+        this.password = password;
     }
 
     @Override
@@ -62,11 +61,11 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    public String passwordGetter(){
+    public String passwordGetter() {
         return this.password;
     }
 
-    public String usernameGetter(){
+    public String usernameGetter() {
         return this.password;
     }
 

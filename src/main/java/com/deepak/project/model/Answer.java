@@ -6,6 +6,7 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -29,7 +30,7 @@ public class Answer {
     @ReadOnlyProperty
     private String userId;
 
-    @NotNull
+    @NotNull @NotBlank
     private String answer_text;
 
     public String getAnswer_id() {
