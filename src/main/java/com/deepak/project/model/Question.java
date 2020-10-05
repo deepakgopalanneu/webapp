@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class Question {
     @ReadOnlyProperty
     private String userId;
 
-    @NotNull
+    @NotNull @NotBlank
     private String question_text;
 
     @ManyToMany(cascade=CascadeType.ALL)
     private List<Category> categories;
 
-    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true )
+    @OneToMany(cascade = CascadeType.ALL )
     @JoinColumn(name = "question_id")
     private List<Answer> answers;
 

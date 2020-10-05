@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -14,7 +15,7 @@ public class Category {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String category_id;
 
-    @NotNull
+    @NotNull @NotBlank
     private String category;
 
     public String getCategory_id() {

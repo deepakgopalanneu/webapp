@@ -13,7 +13,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class QuestionService {
@@ -30,11 +36,19 @@ public class QuestionService {
         question.setCreated_timestamp(LocalDateTime.now().toString());
         question.setUpdated_timestamp(LocalDateTime.now().toString());
         question.setUserId(userId);
-
+        List<Category> givenCategories = question.getCategories();
+        question.setCategories(null);
         List<Category> categoryList = new ArrayList<>();
         try{
-        question.getCategories().stream().forEach( (category) ->{
-            String categoryName = category.getCategory().toLowerCase();
+            givenCategories.stream().filter(distinctByKey(c -> c.getCategory())).forEach( (category) ->{
+            String categoryName = category.getCategory().toLowerCase().trim();
+            if ( null == categoryName || categoryName.trim().isEmpty())
+                    throw new RuntimeException("Category cannot be empty or null");
+            Pattern p = Pattern.compile("[^A-Za-z0-9]");
+            Matcher m = p.matcher(categoryName);
+            boolean b = m.find();
+                if(b)
+                        throw new RuntimeException("Category cannot have special characters");
             Category c = categoryRepo.findByCategory(categoryName);
                 if(null!=c)
                     categoryList.add(c);
@@ -43,7 +57,8 @@ public class QuestionService {
                     addCategory.setCategory(categoryName);
                     categoryList.add(categoryRepo.save(addCategory));
                 } });
-
+            question.setCategories(categoryList);
+            question.setAnswers(new ArrayList<>());
             return questionRepo.save(question);
         }catch (Exception ex){
             throw new QuestionException(ex.getMessage());
@@ -64,7 +79,12 @@ public class QuestionService {
             throw new QuestionException(e.getMessage());
         }
     }
+    public static <T> Predicate<T> distinctByKey(
+            Function<? super T, ?> keyExtractor) {
 
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
 
     public void editQuestion(Question question, String question_id, String userId) throws QuestionException {
 
@@ -75,7 +95,27 @@ public class QuestionService {
                     if(!q.getUserId().equals(userId)){
                         throw new QuestionException("You are not the owner of this question. you cannot delete/modify it");
                     }else{
-                        q.setCategories(question.getCategories());
+                        List<Category> givenCategories = question.getCategories();
+                        q.setCategories(null);
+                        List<Category> categoryList = new ArrayList<>();
+                        givenCategories.stream().filter(distinctByKey(c -> c.getCategory())).forEach( (category) ->{
+                            String categoryName = category.getCategory().toLowerCase().trim();
+                            if ( null == categoryName || categoryName.trim().isEmpty())
+                                throw new RuntimeException("Category cannot be empty or null");
+                            Pattern p = Pattern.compile("[^A-Za-z0-9]");
+                            Matcher m = p.matcher(categoryName);
+                            boolean b = m.find();
+                            if(b)
+                                throw new RuntimeException("Category cannot have special characters");
+                            Category c = categoryRepo.findByCategory(categoryName);
+                            if(null!=c)
+                                categoryList.add(c);
+                            else{
+                                Category addCategory = new Category();
+                                addCategory.setCategory(categoryName);
+                                categoryList.add(categoryRepo.save(addCategory));
+                            } });
+                        q.setCategories(categoryList);
                         q.setQuestion_text(question.getQuestion_text());
                         q.setUpdated_timestamp(LocalDateTime.now().toString());
                         questionRepo.save(q);
@@ -95,8 +135,11 @@ public class QuestionService {
                 Question q = foundQuestion.get();
                 if(!q.getUserId().equals(userId)){
                     throw new QuestionException("You are not the owner of this question. you cannot delete/modify it");
-                }else{
+                }
+                if(q.getAnswers().size()<1){
                     questionRepo.delete(q);
+                }else{
+                    throw new QuestionException("You cannot delete a Question which has answers");
                 }
             }else{
                 throw new QuestionException("Question not found");
@@ -164,7 +207,7 @@ public class QuestionService {
         try{
             List<Question> foundQuestions = (List<Question>) questionRepo.findAll();
             if(foundQuestions.isEmpty()){
-                throw new QuestionException("Question not found");
+                throw new QuestionException("No Questions found");
             }else{
                 return foundQuestions;
             }
