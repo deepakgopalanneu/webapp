@@ -30,7 +30,8 @@ public class Answer {
     @ReadOnlyProperty
     private String userId;
 
-    @NotNull @NotBlank
+    @NotNull
+    @NotBlank
     private String answer_text;
 
     public String getAnswer_id() {

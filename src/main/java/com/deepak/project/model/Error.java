@@ -2,7 +2,8 @@ package com.deepak.project.model;
 
 public class Error {
 
-    String errormessage;
+    private String errormessage;
+    private String description;
 
     public String getErrormessage() {
         return errormessage;
@@ -10,5 +11,13 @@ public class Error {
 
     public void setErrormessage(String errormessage) {
         this.errormessage = errormessage;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

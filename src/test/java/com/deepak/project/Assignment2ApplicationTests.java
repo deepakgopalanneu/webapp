@@ -31,13 +31,13 @@ class Assignment2ApplicationTests {
     private final String email = "csye6225@northeastern.edu";
     private final String password = "somecrazypassword";
     private final String header = "Basic Y3N5ZTYyMjVAbm9ydGhlYXN0ZXJuLmVkdTpzb21lY3JhenlwYXNzd29yZA==";
-//    @Autowired
+    //    @Autowired
     private MockMvc mockMvc;
-//    @MockBean
+    //    @MockBean
     private UserService userService;
     private User user;
 
-//    @Test
+    //    @Test
     void contextLoads() {
     }
 
@@ -51,7 +51,7 @@ class Assignment2ApplicationTests {
 //    }
 
 
-//    @Test
+    //    @Test
     public void createUserMethodShouldCreateUser() throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -80,7 +80,7 @@ class Assignment2ApplicationTests {
                 .andExpect(jsonPath("$.account_updated").value(returnedUser.getAccount_updated()));
     }
 
-//    @Test
+    //    @Test
 //    @WithUserDetails("csye6225@northeastern.edu")
     public void getUserShouldGetCorrespondingUser() throws Exception {
 
@@ -102,7 +102,7 @@ class Assignment2ApplicationTests {
                 .andExpect(jsonPath("$.account_updated").value(user.getAccount_updated()));
     }
 
-//    @Test
+    //    @Test
 //    @WithUserDetails("csye6225@northeastern.edu")
     public void putUserShouldUpdateCorrespondingUser() throws Exception {
 
@@ -162,7 +162,7 @@ class Assignment2ApplicationTests {
 
     @Test
     public void validatedUserShouldValidateEmail() {
-                user = new User();
+        user = new User();
         user.setFirst_name(fname);
         user.setLast_name(lname);
         user.setUsername(email);

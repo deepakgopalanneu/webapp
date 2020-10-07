@@ -25,13 +25,14 @@ public class Question {
     @ReadOnlyProperty
     private String userId;
 
-    @NotNull @NotBlank
+    @NotNull
+    @NotBlank
     private String question_text;
 
-    @ManyToMany(cascade=CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Category> categories;
 
-    @OneToMany(cascade = CascadeType.ALL )
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "question_id")
     private List<Answer> answers;
 

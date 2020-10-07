@@ -67,7 +67,7 @@ public class UserService {
      * @throws UserException
      */
     public User putUser(String email, User user) throws UserException {
-        if(null!= user.getAccount_updated() || null!=user.getAccount_created()){
+        if (null != user.getAccount_updated() || null != user.getAccount_created()) {
             throw new UserException("Put Request should not contain account_updated or account_created fields");
         }
         User userExistsForUpdatedEmail = null;
@@ -93,11 +93,11 @@ public class UserService {
     public User getUnknownUser(String id) throws UserException {
         try {
             Optional<User> optional = userRepo.findById(id);
-            if(optional.isPresent())
+            if (optional.isPresent())
                 return optional.get();
             else
                 throw new UserException("User Not found");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new UserException(e.getMessage());
         }
     }

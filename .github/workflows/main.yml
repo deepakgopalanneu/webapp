@@ -1,9 +1,9 @@
 name: Master Branch Pull Request
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
 jobs:
   build:
     name: Build and run Units & Integrations Tests
