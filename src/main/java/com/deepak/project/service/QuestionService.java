@@ -101,9 +101,13 @@ public class QuestionService {
                 if (!q.getUserId().equals(userId)) {
                     throw new QuestionException("You are not the owner of this question. you cannot delete/modify it");
                 } else {
-                    List<Category> givenCategories = question.getCategories();
-                    q.setCategories(null);
+                    List<Category> givenCategories = null;
                     List<Category> categoryList = new ArrayList<>();
+                    if (null != question.getCategories())
+                        givenCategories = question.getCategories();
+                    else
+                        givenCategories = new ArrayList<>();
+                    question.setCategories(null);
                     givenCategories.stream().filter(distinctByKey(c -> c.getCategory())).forEach((category) -> {
                         String categoryName = category.getCategory().toLowerCase().trim();
                         if (null == categoryName || categoryName.trim().isEmpty())
