@@ -41,7 +41,7 @@ public class ServiceTest {
 //        user.setPassword(password);
 //    }
 
-//    @Test
+    //    @Test
     public void createUserServiceShouldReturnUser() throws UserException {
         User returnedUser = new User();
         User user = new User();
@@ -77,7 +77,7 @@ public class ServiceTest {
         assertThrows(UserException.class, () -> userService.createUser(user));
     }
 
-//    @Test
+    //    @Test
     public void getUserServiceShouldReturnUser() throws UserException {
         User user = new User();
         user.setFirst_name(fname);
@@ -115,7 +115,7 @@ public class ServiceTest {
         assertThat(u).isNotNull();
     }
 
-//    @Test
+    //    @Test
     public void putUserServiceShouldThrowExceptionForEmailUpdate() {
         User user = new User();
         user.setFirst_name(fname);

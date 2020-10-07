@@ -36,9 +36,17 @@ public class UserPrincipal implements UserDetails {
         return passwordGetter();
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String getUsername() {
         return usernameGetter();
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
@@ -66,9 +74,8 @@ public class UserPrincipal implements UserDetails {
     }
 
     public String usernameGetter() {
-        return this.password;
+        return this.username;
     }
-
 
     public String getId() {
         return id;
@@ -92,14 +99,6 @@ public class UserPrincipal implements UserDetails {
 
     public void setLast_name(String last_name) {
         this.last_name = last_name;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
 

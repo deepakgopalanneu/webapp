@@ -84,7 +84,7 @@ public class UserHandler {
      * @throws UserException
      */
     @PostMapping("/v1/user")
-    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user ) throws UserException {
+    public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user) throws UserException {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(validatedUser(user)));
     }
@@ -97,7 +97,7 @@ public class UserHandler {
      * @throws UserException
      */
     @GetMapping("/v1/user/self")
-    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value ) throws UserException {
+    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value) throws UserException {
 
         User u = userService.getUser(extractEmailFromHeader(value));
         if (null != u)
@@ -113,14 +113,14 @@ public class UserHandler {
      * @throws UserException
      */
     @PutMapping("/v1/user/self")
-    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody  @NotNull @Valid User user) throws UserException {
+    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody @NotNull @Valid User user) throws UserException {
 
         userService.putUser(extractEmailFromHeader(value), validatedUser(user));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/v1/user/{id}")
-    public ResponseEntity<User> getUnknownUser(@PathVariable("id") @NotNull String id ) throws  UserException{
+    public ResponseEntity<User> getUnknownUser(@PathVariable("id") @NotNull String id) throws UserException {
         return ResponseEntity.ok(userService.getUnknownUser(id));
     }
 }
