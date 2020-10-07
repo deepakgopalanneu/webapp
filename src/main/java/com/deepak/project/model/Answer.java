@@ -30,8 +30,8 @@ public class Answer {
     @ReadOnlyProperty
     private String userId;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "answer_text has to be present")
+    @NotBlank(message = "answer_text has to be present")
     private String answer_text;
 
     public String getAnswer_id() {

@@ -17,6 +17,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    final String user_not_found="User Not found";
+
     /**
      * This method encodes the password, assigns timestamps and calls Repository to persist the User
      *
@@ -96,7 +98,7 @@ public class UserService {
             if (optional.isPresent())
                 return optional.get();
             else
-                throw new UserException("User Not found");
+                throw new UserException(user_not_found);
         } catch (Exception e) {
             throw new UserException(e.getMessage());
         }
