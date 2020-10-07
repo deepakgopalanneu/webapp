@@ -25,14 +25,19 @@ public class Question {
     @ReadOnlyProperty
     private String userId;
 
-    @NotNull
-    @NotBlank
+    @NotNull (message = "question_text has to be present")
+    @NotBlank (message = "question_text has to be present")
     private String question_text;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.REFRESH,
+            CascadeType.PERSIST
+    } )
     private List<Category> categories;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany()
     @JoinColumn(name = "question_id")
     private List<Answer> answers;
 

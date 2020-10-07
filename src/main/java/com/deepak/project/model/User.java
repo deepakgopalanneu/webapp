@@ -15,16 +15,16 @@ public class User {
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
-    @NotNull
+    @NotNull (message = "first_name has to be present")
     private String first_name;
-    @NotNull
+    @NotNull(message = "last_name has to be present")
     private String last_name;
-    @NotNull
+    @NotNull (message = "password has to be present")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
 
-    @NotNull
+    @NotNull (message = "username has to be present")
     private String username;
     @ReadOnlyProperty
     private String account_created;

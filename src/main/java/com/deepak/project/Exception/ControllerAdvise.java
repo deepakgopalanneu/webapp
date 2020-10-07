@@ -27,6 +27,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ControllerAdvise extends ResponseEntityExceptionHandler {
 
+    final String user_not_found="User Not found";
+    final String not_found="Question not found";
+    final String answer_notfound="Answer not found";
     /**
      * this method handles all UserException thrown
      *
@@ -37,7 +40,10 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
     public ResponseEntity<Error> handleUserException(UserException ex) {
         Error error = new Error();
         error.setErrormessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        if(error.getErrormessage().equals(user_not_found))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        else
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**
@@ -50,7 +56,10 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
     public ResponseEntity<Error> handleUserException(QuestionException ex) {
         Error error = new Error();
         error.setErrormessage(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        if(error.getErrormessage().equals(not_found) || error.getErrormessage().equals(answer_notfound) )
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        else
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**

@@ -15,8 +15,8 @@ public class Category {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String category_id;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "category has to be present")
+    @NotBlank(message = "category has to be present")
     private String category;
 
     public String getCategory_id() {
