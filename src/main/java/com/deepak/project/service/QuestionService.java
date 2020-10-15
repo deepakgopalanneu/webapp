@@ -8,10 +8,7 @@ import com.deepak.project.repository.AnswerRepository;
 import com.deepak.project.repository.CategoryRepository;
 import com.deepak.project.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,15 +25,15 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionService {
 
+    final String not_found = "Question not found";
+    final String answer_notfound = "Answer not found";
+    final String forbidden = "Forbidden! You are not the owner of this question. you cannot delete/modify it";
     @Autowired
     QuestionRepository questionRepo;
     @Autowired
     CategoryRepository categoryRepo;
     @Autowired
     AnswerRepository answerRepo;
-
-    final String not_found="Question not found";
-    final String answer_notfound="Answer not found";
 
     public static <T> Predicate<T> distinctByKey(
             Function<? super T, ?> keyExtractor) {
@@ -45,7 +42,6 @@ public class QuestionService {
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    //    @Transactional
     public Question createQuestion(Question question, String userId) throws QuestionException {
         question.setCreated_timestamp(LocalDateTime.now().toString());
         question.setUpdated_timestamp(LocalDateTime.now().toString());
@@ -94,7 +90,7 @@ public class QuestionService {
 
         try {
             Optional<Question> q = questionRepo.findById(question_id);
-            if(q.isPresent())
+            if (q.isPresent())
                 return answerRepo.save(answer);
             else
                 throw new QuestionException(not_found);
@@ -110,7 +106,7 @@ public class QuestionService {
             if (foundQuestion.isPresent()) {
                 Question q = foundQuestion.get();
                 if (!q.getUserId().equals(userId)) {
-                    throw new QuestionException("You are not the owner of this question. you cannot delete/modify it");
+                    throw new QuestionException(forbidden);
                 } else {
                     List<Category> givenCategories = null;
                     List<Category> categoryList = new ArrayList<>();
@@ -156,7 +152,7 @@ public class QuestionService {
             if (foundQuestion.isPresent()) {
                 Question q = foundQuestion.get();
                 if (!q.getUserId().equals(userId)) {
-                    throw new QuestionException("You are not the owner of this question. you cannot delete/modify it");
+                    throw new QuestionException(forbidden);
                 }
                 if (q.getAnswers().size() < 1) {
                     questionRepo.deleteById(question_id);
@@ -174,8 +170,8 @@ public class QuestionService {
     public void updateAnswer(String question_id, String answer_id, String answer_text, String userId) throws QuestionException {
         try {
             Optional<Question> questOptional = questionRepo.findById(question_id);
-            Answer ans =null;
-            if(questOptional.isPresent()) {
+            Answer ans = null;
+            if (questOptional.isPresent()) {
                 Question q = questOptional.get();
                 List<Answer> answers = q.getAnswers().stream().filter((a) -> a.getAnswer_id().equals(answer_id)).collect(Collectors.toList());
                 if (answers.size() < 1)
@@ -183,41 +179,42 @@ public class QuestionService {
                 else {
                     ans = answers.get(0);
                     if (!ans.getUserId().equals(userId)) {
-                        throw new QuestionException("You are not the owner of this Answer. you cannot delete/modify it");
+                        throw new QuestionException(forbidden);
                     } else {
                         ans.setAnswer_text(answer_text);
                         ans.setUpdated_timestamp(LocalDateTime.now().toString());
                         answerRepo.save(ans);
                     }
                 }
-            }else {
+            } else {
                 throw new QuestionException(not_found);
             }
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
         }
     }
-//    @Modifying
+
+    //    @Modifying
 //    @Transactional
 //    @Query(value="delete from answer a where a.answer_id = ?1")
     public void deleteAnswer(String answer_id, String question_id, String userId) throws QuestionException {
         try {
             Optional<Question> questOptional = questionRepo.findById(question_id);
-            Answer ans ;
-            if(questOptional.isPresent()){
+            Answer ans;
+            if (questOptional.isPresent()) {
                 Question q = questOptional.get();
-                List<Answer> answers = q.getAnswers().stream().filter( (a) -> a.getAnswer_id().equals(answer_id) ).collect(Collectors.toList());
-                if(answers.size() < 1)
+                List<Answer> answers = q.getAnswers().stream().filter((a) -> a.getAnswer_id().equals(answer_id)).collect(Collectors.toList());
+                if (answers.size() < 1)
                     throw new QuestionException(answer_notfound);
                 else {
                     ans = answers.get(0);
                     if (!ans.getUserId().equals(userId)) {
-                        throw new QuestionException("You are not the owner of this Answer. you cannot delete/modify it");
+                        throw new QuestionException(forbidden);
                     } else {
                         answerRepo.deleteById(ans.getAnswer_id());
                     }
                 }
-            }else{
+            } else {
                 throw new QuestionException(not_found);
             }
         } catch (Exception e) {

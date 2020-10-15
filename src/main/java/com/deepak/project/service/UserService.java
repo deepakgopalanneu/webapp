@@ -12,12 +12,11 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+    final String user_not_found = "User Not found";
     @Autowired
     UserRepository userRepo;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    final String user_not_found="User Not found";
 
     /**
      * This method encodes the password, assigns timestamps and calls Repository to persist the User
