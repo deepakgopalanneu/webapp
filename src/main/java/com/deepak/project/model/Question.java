@@ -25,8 +25,8 @@ public class Question {
     @ReadOnlyProperty
     private String userId;
 
-    @NotNull (message = "question_text has to be present")
-    @NotBlank (message = "question_text has to be present")
+    @NotNull(message = "question_text has to be present")
+    @NotBlank(message = "question_text has to be present")
     private String question_text;
 
     @ManyToMany(cascade = {
@@ -34,7 +34,7 @@ public class Question {
             CascadeType.MERGE,
             CascadeType.REFRESH,
             CascadeType.PERSIST
-    } )
+    })
     private List<Category> categories;
 
     @OneToMany()
