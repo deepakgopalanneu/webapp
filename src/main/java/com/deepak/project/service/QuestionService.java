@@ -74,6 +74,7 @@ public class QuestionService {
             });
             question.setCategories(categoryList);
             question.setAnswers(new ArrayList<>());
+            question.setAttachments(new ArrayList<>());
             return questionRepo.save(question);
         } catch (Exception ex) {
             throw new QuestionException(ex.getMessage());
@@ -87,7 +88,7 @@ public class QuestionService {
         answer.setQuestion_id(question_id);
         answer.setCreated_timestamp(LocalDateTime.now().toString());
         answer.setUpdated_timestamp(LocalDateTime.now().toString());
-
+        answer.setAttachments(new ArrayList<>());
         try {
             Optional<Question> q = questionRepo.findById(question_id);
             if (q.isPresent())

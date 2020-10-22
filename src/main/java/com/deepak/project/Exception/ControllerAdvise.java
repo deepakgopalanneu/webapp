@@ -30,7 +30,9 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
     final String user_not_found = "User Not found";
     final String not_found = "Question not found";
     final String answer_notfound = "Answer not found";
+    final String file_notfound = "File not found";
     final String forbidden = "Forbidden! You are not the owner of this question. you cannot delete/modify it";
+    final String typeUnsupported = "File type Unsupported";
 
     /**
      * this method handles all UserException thrown
@@ -44,8 +46,8 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
         error.setErrormessage(ex.getMessage());
         if (error.getErrormessage().equals(user_not_found))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**
@@ -60,10 +62,30 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
         error.setErrormessage(ex.getMessage());
         if (error.getErrormessage().equals(not_found) || error.getErrormessage().equals(answer_notfound))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        else if (error.getErrormessage().equals(forbidden))
+        if (error.getErrormessage().equals(forbidden))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-        else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * this method handles all FileException thrown
+     *
+     * @param ex
+     * @return ResponseEntity of type Error
+     */
+    @ExceptionHandler(FileException.class)
+    public ResponseEntity<Error> handleFileException(FileException ex) {
+        Error error = new Error();
+        error.setErrormessage(ex.getMessage());
+        if (null != ex.getDescription())
+            error.setDescription(ex.getDescription());
+        if (error.getErrormessage().equals(forbidden))
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
+        if (error.getErrormessage().equals(file_notfound))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**

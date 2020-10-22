@@ -3,11 +3,10 @@ package com.deepak.project.model;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 public class Answer {
@@ -33,6 +32,19 @@ public class Answer {
     @NotNull(message = "answer_text has to be present")
     @NotBlank(message = "answer_text has to be present")
     private String answer_text;
+
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "answer_id")
+    private List<File> attachments;
+
+    public List<File> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<File> attachments) {
+        this.attachments = attachments;
+    }
+
 
     public String getAnswer_id() {
         return answer_id;

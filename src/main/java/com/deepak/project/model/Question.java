@@ -41,6 +41,19 @@ public class Question {
     @JoinColumn(name = "question_id")
     private List<Answer> answers;
 
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "question_id")
+    private List<File> attachments;
+
+    public List<File> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<File> attachments) {
+        this.attachments = attachments;
+    }
+
+
     public String getQuestion_id() {
         return question_id;
     }
