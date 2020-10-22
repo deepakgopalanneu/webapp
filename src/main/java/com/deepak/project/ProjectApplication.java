@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableJpaRepositories
 @ComponentScan(basePackages = "com.deepak.project.*")
-public class Assignment2Application {
+public class ProjectApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Assignment2Application.class, args);
+        SpringApplication.run(ProjectApplication.class, args);
     }
 
 }

@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.deepak</groupId>
-    <artifactId>assignment2</artifactId>
+    <artifactId>project</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>assignment2</name>
-    <description>post, get and put User model and handle authentication</description>
+    <name>project</name>
+    <description>CSYE 6225 - Course Project</description>
 
     <properties>
         <java.version>11</java.version>

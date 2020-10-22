@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @Testable
-class Assignment2ApplicationTests {
+class ProjectApplicationTests {
 
     private final String id = "ff80818174d7e84e0174d7eaf6c50";
     private final String fname = "someFirstName";
