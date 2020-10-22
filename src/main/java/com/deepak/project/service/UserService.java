@@ -3,6 +3,7 @@ package com.deepak.project.service;
 import com.deepak.project.Exception.UserException;
 import com.deepak.project.model.User;
 import com.deepak.project.repository.UserRepository;
+import com.deepak.project.util.CustomStrings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    final String user_not_found = "User Not found";
+
     @Autowired
     UserRepository userRepo;
     @Autowired
@@ -97,7 +98,7 @@ public class UserService {
             if (optional.isPresent())
                 return optional.get();
             else
-                throw new UserException(user_not_found);
+                throw new UserException(CustomStrings.user_not_found);
         } catch (Exception e) {
             throw new UserException(e.getMessage());
         }
