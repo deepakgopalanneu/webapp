@@ -1,12 +1,15 @@
 package com.deepak.project.service;
 
+import com.deepak.project.Exception.FileException;
 import com.deepak.project.Exception.QuestionException;
 import com.deepak.project.model.Answer;
 import com.deepak.project.model.Category;
+import com.deepak.project.model.File;
 import com.deepak.project.model.Question;
 import com.deepak.project.repository.AnswerRepository;
 import com.deepak.project.repository.CategoryRepository;
 import com.deepak.project.repository.QuestionRepository;
+import com.deepak.project.util.CustomStrings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,20 +23,18 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
 
-    final String not_found = "Question not found";
-    final String answer_notfound = "Answer not found";
-    final String forbidden = "Forbidden! You are not the owner of this question. you cannot delete/modify it";
     @Autowired
     QuestionRepository questionRepo;
     @Autowired
     CategoryRepository categoryRepo;
     @Autowired
     AnswerRepository answerRepo;
+    @Autowired
+    FileService fileService;
 
     public static <T> Predicate<T> distinctByKey(
             Function<? super T, ?> keyExtractor) {
@@ -94,7 +95,7 @@ public class QuestionService {
             if (q.isPresent())
                 return answerRepo.save(answer);
             else
-                throw new QuestionException(not_found);
+                throw new QuestionException(CustomStrings.not_found);
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
         }
@@ -107,7 +108,7 @@ public class QuestionService {
             if (foundQuestion.isPresent()) {
                 Question q = foundQuestion.get();
                 if (!q.getUserId().equals(userId)) {
-                    throw new QuestionException(forbidden);
+                    throw new QuestionException(CustomStrings.forbidden);
                 } else {
                     List<Category> givenCategories = null;
                     List<Category> categoryList = new ArrayList<>();
@@ -140,11 +141,21 @@ public class QuestionService {
                     questionRepo.save(q);
                 }
             } else {
-                throw new QuestionException(not_found);
+                throw new QuestionException(CustomStrings.not_found);
             }
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
         }
+    }
+
+    private void deleteImagesFromS3(List<File> attachments) {
+        attachments.stream().forEach(f -> {
+            try {
+                fileService.deleteImageBys3ObjectName(f.getS3ObjectName());
+            } catch (FileException e) {
+                throw new RuntimeException("Unable to Delete Images attached to this Question");
+            }
+        });
     }
 
     public void deleteQuestion(String question_id, String userId) throws QuestionException {
@@ -153,15 +164,18 @@ public class QuestionService {
             if (foundQuestion.isPresent()) {
                 Question q = foundQuestion.get();
                 if (!q.getUserId().equals(userId)) {
-                    throw new QuestionException(forbidden);
+                    throw new QuestionException(CustomStrings.forbidden);
                 }
                 if (q.getAnswers().size() < 1) {
+                    if (q.getAttachments().size() > 0) {
+                        deleteImagesFromS3(q.getAttachments());
+                    }
                     questionRepo.deleteById(question_id);
                 } else {
                     throw new QuestionException("You cannot delete a Question which has answers");
                 }
             } else {
-                throw new QuestionException(not_found);
+                throw new QuestionException(CustomStrings.not_found);
             }
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
@@ -174,49 +188,48 @@ public class QuestionService {
             Answer ans = null;
             if (questOptional.isPresent()) {
                 Question q = questOptional.get();
-                List<Answer> answers = q.getAnswers().stream().filter((a) -> a.getAnswer_id().equals(answer_id)).collect(Collectors.toList());
-                if (answers.size() < 1)
-                    throw new QuestionException(answer_notfound);
-                else {
-                    ans = answers.get(0);
+                Optional<Answer> answers = q.getAnswers().stream().filter((a) -> a.getAnswer_id().equals(answer_id)).findFirst();
+                if (answers.isPresent()) {
+                    ans = answers.get();
                     if (!ans.getUserId().equals(userId)) {
-                        throw new QuestionException(forbidden);
+                        throw new QuestionException(CustomStrings.forbidden);
                     } else {
                         ans.setAnswer_text(answer_text);
                         ans.setUpdated_timestamp(LocalDateTime.now().toString());
                         answerRepo.save(ans);
                     }
+                } else {
+                    throw new QuestionException(CustomStrings.answer_notfound);
                 }
             } else {
-                throw new QuestionException(not_found);
+                throw new QuestionException(CustomStrings.not_found);
             }
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
         }
     }
 
-    //    @Modifying
-//    @Transactional
-//    @Query(value="delete from answer a where a.answer_id = ?1")
     public void deleteAnswer(String answer_id, String question_id, String userId) throws QuestionException {
         try {
             Optional<Question> questOptional = questionRepo.findById(question_id);
             Answer ans;
             if (questOptional.isPresent()) {
                 Question q = questOptional.get();
-                List<Answer> answers = q.getAnswers().stream().filter((a) -> a.getAnswer_id().equals(answer_id)).collect(Collectors.toList());
-                if (answers.size() < 1)
-                    throw new QuestionException(answer_notfound);
-                else {
-                    ans = answers.get(0);
+                Optional<Answer> answers = q.getAnswers().stream().filter((a) -> a.getAnswer_id().equals(answer_id)).findFirst();
+                if (answers.isPresent()) {
+                    ans = answers.get();
                     if (!ans.getUserId().equals(userId)) {
-                        throw new QuestionException(forbidden);
+                        throw new QuestionException(CustomStrings.forbidden);
                     } else {
+                        if (ans.getAttachments().size() > 0)
+                            deleteImagesFromS3(ans.getAttachments());
                         answerRepo.deleteById(ans.getAnswer_id());
                     }
+                } else {
+                    throw new QuestionException(CustomStrings.answer_notfound);
                 }
             } else {
-                throw new QuestionException(not_found);
+                throw new QuestionException(CustomStrings.not_found);
             }
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
@@ -229,7 +242,7 @@ public class QuestionService {
             if (foundQuestion.isPresent()) {
                 return foundQuestion.get();
             } else {
-                throw new QuestionException(not_found);
+                throw new QuestionException(CustomStrings.not_found);
             }
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
@@ -240,7 +253,7 @@ public class QuestionService {
         try {
             List<Question> foundQuestions = (List<Question>) questionRepo.findAll();
             if (foundQuestions.isEmpty()) {
-                throw new QuestionException(not_found);
+                throw new QuestionException(CustomStrings.not_found);
             } else {
                 return foundQuestions;
             }
@@ -256,7 +269,7 @@ public class QuestionService {
                 Answer ans = foundAnswer.get();
                 return ans;
             } else {
-                throw new QuestionException(answer_notfound);
+                throw new QuestionException(CustomStrings.answer_notfound);
             }
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());

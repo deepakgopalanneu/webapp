@@ -1,6 +1,7 @@
 package com.deepak.project.Exception;
 
 import com.deepak.project.model.Error;
+import com.deepak.project.util.CustomStrings;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
@@ -27,12 +28,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ControllerAdvise extends ResponseEntityExceptionHandler {
 
-    final String user_not_found = "User Not found";
-    final String not_found = "Question not found";
-    final String answer_notfound = "Answer not found";
-    final String file_notfound = "File not found";
-    final String forbidden = "Forbidden! You are not the owner of this question. you cannot delete/modify it";
-    final String typeUnsupported = "File type Unsupported";
 
     /**
      * this method handles all UserException thrown
@@ -44,7 +39,7 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
     public ResponseEntity<Error> handleUserException(UserException ex) {
         Error error = new Error();
         error.setErrormessage(ex.getMessage());
-        if (error.getErrormessage().equals(user_not_found))
+        if (error.getErrormessage().equals(CustomStrings.user_not_found))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -60,9 +55,9 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
     public ResponseEntity<Error> handleUserException(QuestionException ex) {
         Error error = new Error();
         error.setErrormessage(ex.getMessage());
-        if (error.getErrormessage().equals(not_found) || error.getErrormessage().equals(answer_notfound))
+        if (error.getErrormessage().equals(CustomStrings.not_found) || error.getErrormessage().equals(CustomStrings.answer_notfound))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        if (error.getErrormessage().equals(forbidden))
+        if (error.getErrormessage().equals(CustomStrings.forbidden))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -80,10 +75,12 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
         error.setErrormessage(ex.getMessage());
         if (null != ex.getDescription())
             error.setDescription(ex.getDescription());
-        if (error.getErrormessage().equals(forbidden))
+        if (error.getErrormessage().equals(CustomStrings.typeUnsupported))
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
-        if (error.getErrormessage().equals(file_notfound))
+        if (error.getErrormessage().equals(CustomStrings.file_notfound))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        if(error.getErrormessage().equals(CustomStrings.file_exists))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

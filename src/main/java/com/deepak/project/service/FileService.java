@@ -1,5 +1,6 @@
 package com.deepak.project.service;
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -12,6 +13,7 @@ import com.deepak.project.model.Question;
 import com.deepak.project.repository.AnswerRepository;
 import com.deepak.project.repository.FileRepository;
 import com.deepak.project.repository.QuestionRepository;
+import com.deepak.project.util.CustomStrings;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +25,7 @@ import java.util.Optional;
 @Service
 public class FileService {
 
-    final String forbidden = "Forbidden! You are not the owner of this question. you cannot delete/modify it";
-    final String not_found = "Question not found";
-    final String answer_notfound = "Answer not found";
-    final String file_notfound = "File not found";
-    final String typeUnsupported = "File type Unsupported";
+
     @Autowired
     AnswerRepository answerRepo;
     @Autowired
@@ -38,6 +36,13 @@ public class FileService {
     private FileRepository fileRepo;
     private String bucketName = "webapp.deepak.gopalan";
 
+    public void checkForFileNameConflict(String s3ObjectName) throws FileException {
+        Optional<File> Optionalfile= fileRepo.findByS3ObjectName(s3ObjectName);
+        if(Optionalfile.isPresent()){
+            throw new FileException(CustomStrings.file_exists);
+        }
+    }
+
 
     public File saveFileToS3(MultipartFile uploadedFile, String userId, String questionId) throws FileException, QuestionException {
 
@@ -45,14 +50,15 @@ public class FileService {
         if (fetchedQuestion.isPresent()) {
             Question question = fetchedQuestion.get();
             if (userId.equals(question.getUserId())) {
-                String s3ObjectName = questionId + LocalDateTime.now().toString();
                 try {
                     ObjectMetadata data = new ObjectMetadata();
                     data.setContentType(uploadedFile.getContentType());
                     data.setContentLength(uploadedFile.getSize());
                     Tika tika = new Tika();
                     String detectedType = tika.detect(uploadedFile.getBytes()).split("/")[1];
+                    String s3ObjectName = questionId + uploadedFile.getOriginalFilename();
                     if (detectedType.equals("png") || detectedType.equals("jpg") || detectedType.equals("jpeg")) {
+                        checkForFileNameConflict(s3ObjectName);
                         amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName, uploadedFile.getInputStream(), data)
                                 .withCannedAcl(CannedAccessControlList.PublicRead));
                         File file = new File();
@@ -67,16 +73,16 @@ public class FileService {
                             throw new FileException("Unable to save file data to RDS - " + e.getLocalizedMessage());
                         }
                     } else {
-                        throw new FileException(typeUnsupported);
+                        throw new FileException(CustomStrings.typeUnsupported);
                     }
                 } catch (Exception e) {
                     throw new FileException("Unable to save file", e.getLocalizedMessage());
                 }
             } else {
-                throw new QuestionException(forbidden);
+                throw new QuestionException(CustomStrings.forbidden);
             }
         } else {
-            throw new QuestionException(not_found);
+            throw new QuestionException(CustomStrings.not_found);
         }
     }
 
@@ -88,14 +94,15 @@ public class FileService {
             if (fetchedAnswer.isPresent()) {
                 Answer answer = fetchedAnswer.get();
                 if (userId.equals(answer.getUserId())) {
-                    String s3ObjectName = answerId + LocalDateTime.now().toString();
                     try {
                         ObjectMetadata data = new ObjectMetadata();
                         data.setContentType(uploadedFile.getContentType());
                         data.setContentLength(uploadedFile.getSize());
                         Tika tika = new Tika();
                         String detectedType = tika.detect(uploadedFile.getBytes()).split("/")[1];
+                        String s3ObjectName = answerId + uploadedFile.getOriginalFilename();
                         if (detectedType.equals("png") || detectedType.equals("jpg") || detectedType.equals("jpeg")) {
+                            checkForFileNameConflict(s3ObjectName);
                             amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName, uploadedFile.getInputStream(), data)
                                     .withCannedAcl(CannedAccessControlList.PublicRead));
                             File file = new File();
@@ -110,20 +117,19 @@ public class FileService {
                                 throw new FileException("Unable to save file data to RDS - " + e.getLocalizedMessage());
                             }
                         } else {
-                            throw new FileException(typeUnsupported);
+                            throw new FileException(CustomStrings.typeUnsupported);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new FileException("Unable to save file", e.getLocalizedMessage());
+                        throw new FileException(e.getMessage());
                     }
                 } else {
-                    throw new QuestionException(forbidden);
+                    throw new QuestionException(CustomStrings.forbidden);
                 }
             } else {
-                throw new QuestionException(answer_notfound);
+                throw new QuestionException(CustomStrings.answer_notfound);
             }
         } else {
-            throw new QuestionException(not_found);
+            throw new QuestionException(CustomStrings.not_found);
         }
     }
 
@@ -147,13 +153,13 @@ public class FileService {
                         throw new FileException("Unable to delete File from RDS", e.getLocalizedMessage());
                     }
                 } else {
-                    throw new FileException(file_notfound);
+                    throw new FileException(CustomStrings.file_notfound);
                 }
             } else {
-                throw new QuestionException(forbidden);
+                throw new QuestionException(CustomStrings.forbidden);
             }
         } else {
-            throw new QuestionException(not_found);
+            throw new QuestionException(CustomStrings.not_found);
         }
     }
 
@@ -178,16 +184,24 @@ public class FileService {
                             throw new FileException("Unable to delete File from RDS", e.getLocalizedMessage());
                         }
                     } else {
-                        throw new FileException(file_notfound);
+                        throw new FileException(CustomStrings.file_notfound);
                     }
                 } else {
-                    throw new QuestionException(forbidden);
+                    throw new QuestionException(CustomStrings.forbidden);
                 }
             } else {
-                throw new QuestionException(answer_notfound);
+                throw new QuestionException(CustomStrings.answer_notfound);
             }
         } else {
-            throw new QuestionException(not_found);
+            throw new QuestionException(CustomStrings.not_found);
+        }
+    }
+
+    public void deleteImageBys3ObjectName(String s3ObjectName) throws FileException {
+        try{
+            amazonS3.deleteObject(bucketName,s3ObjectName);
+        }catch (Exception e){
+            throw new FileException(e.getMessage());
         }
     }
 }
