@@ -1,5 +1,7 @@
 package com.deepak.project.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -19,6 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -43,7 +48,40 @@ public class FileService {
         }
     }
 
+    public java.io.File convertMultipartFileToFile(MultipartFile uploadedFile) throws FileException {
+        java.io.File convFile = new java.io.File(uploadedFile.getOriginalFilename());
+        try {
+            FileOutputStream fos = new FileOutputStream(convFile);
+            fos.write(uploadedFile.getBytes());
+            fos.close();
+        } catch (Exception e) {
+            throw new FileException(CustomStrings.file_conversion_error);
+        }
+        return convFile;
+    }
+    public void verifyUserHasPermissionToModifyResource(String userId, String questionId, String answerId, String validateForQorA){
 
+        if(validateForQorA.equals("Q")){
+
+        }else{
+
+        }
+
+    }
+    public String validateFileExtensionAndGenerateS3ObjectName(MultipartFile uploadedFile, String questionId) throws FileException {
+        Tika tika = new Tika();
+        String detectedType = null;
+        try {
+            detectedType = tika.detect(uploadedFile.getBytes()).split("/")[1];
+        } catch (IOException e) {
+            throw new FileException(CustomStrings.typeUnsupported, e.getLocalizedMessage());
+        }
+        if (detectedType.equals("png") || detectedType.equals("jpg") || detectedType.equals("jpeg"))
+            return questionId + uploadedFile.getOriginalFilename();
+        else
+            throw new FileException(CustomStrings.typeUnsupported);
+
+    }
     public File saveFileToS3(MultipartFile uploadedFile, String userId, String questionId) throws FileException, QuestionException {
 
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
@@ -51,32 +89,18 @@ public class FileService {
             Question question = fetchedQuestion.get();
             if (userId.equals(question.getUserId())) {
                 try {
-                    ObjectMetadata data = new ObjectMetadata();
-                    data.setContentType(uploadedFile.getContentType());
-                    data.setContentLength(uploadedFile.getSize());
-                    Tika tika = new Tika();
-                    String detectedType = tika.detect(uploadedFile.getBytes()).split("/")[1];
-                    String s3ObjectName = questionId + uploadedFile.getOriginalFilename();
-                    if (detectedType.equals("png") || detectedType.equals("jpg") || detectedType.equals("jpeg")) {
-                        checkForFileNameConflict(s3ObjectName);
-                        amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName, uploadedFile.getInputStream(), data)
-                                .withCannedAcl(CannedAccessControlList.PublicRead));
-                        File file = new File();
-                        file.setCreated_date(LocalDateTime.now().toString());
-                        file.setFileName(uploadedFile.getOriginalFilename());
-                        file.setS3ObjectName(s3ObjectName);
-                        file.setQuestion_id(questionId);
-                        try {
-                            return fileRepo.save(file);
-                        } catch (Exception e) {
-                            amazonS3.deleteObject(bucketName, s3ObjectName);
-                            throw new FileException("Unable to save file data to RDS - " + e.getLocalizedMessage());
-                        }
-                    } else {
-                        throw new FileException(CustomStrings.typeUnsupported);
-                    }
-                } catch (Exception e) {
-                    throw new FileException("Unable to save file", e.getLocalizedMessage());
+                    ObjectMetadata metaData = new ObjectMetadata();
+                    metaData.setContentType(uploadedFile.getContentType());
+                    metaData.setContentLength(uploadedFile.getSize());
+                    String s3ObjectName = validateFileExtensionAndGenerateS3ObjectName(uploadedFile,questionId);
+                    checkForFileNameConflict(s3ObjectName);
+                    java.io.File fileToSave = convertMultipartFileToFile(uploadedFile);
+                    amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName,fileToSave )
+                            .withCannedAcl(CannedAccessControlList.PublicRead)
+                            .withMetadata(metaData));
+                    return saveFileToDB(s3ObjectName,questionId,uploadedFile.getOriginalFilename());
+                } catch ( SdkClientException e) {
+                    throw new FileException("Unable to save file to S3", e.getLocalizedMessage());
                 }
             } else {
                 throw new QuestionException(CustomStrings.forbidden);
@@ -86,6 +110,19 @@ public class FileService {
         }
     }
 
+    public File saveFileToDB(String s3ObjectName, String questionId , String fileName) throws FileException {
+        File file = new File();
+        file.setCreated_date(LocalDateTime.now().toString());
+        file.setFileName(fileName);
+        file.setS3ObjectName(s3ObjectName);
+        file.setQuestion_id(questionId);
+        try {
+            return fileRepo.save(file);
+        } catch (Exception e) {
+            amazonS3.deleteObject(bucketName, s3ObjectName);
+            throw new FileException("Unable to save file data to RDS - " + e.getLocalizedMessage());
+        }
+    }
 
     public File saveFileToAnswer(MultipartFile uploadedFile, String userId, String questionId, String answerId) throws QuestionException, FileException {
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);

@@ -9,5 +9,5 @@ public class CustomStrings {
     public static final String forbidden = "Forbidden! You are not the owner of this question. you cannot delete/modify it";
     public static final String typeUnsupported = "File type Unsupported";
     public static final String file_exists="A File with the same name already Exists! Please try another name";
-
+    public static final String file_conversion_error= "IO Error while Reading Uploaded File";
 }
