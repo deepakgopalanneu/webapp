@@ -18,11 +18,8 @@ import java.security.Principal;
 @RestController
 public class FileHandler {
 
-    private final FileService fileService;
-
-    public FileHandler(FileService fileService) {
-        this.fileService = fileService;
-    }
+    @Autowired
+    private FileService fileService;
 
     @PostMapping("/v1/question/{question_id}/file")
     public ResponseEntity<File> postImageToQuestion(@RequestPart @NotNull MultipartFile uploadedFile,
@@ -30,7 +27,7 @@ public class FileHandler {
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(fileService.saveFileToQuestion(uploadedFile, userId, questionId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(fileService.saveFileToS3(uploadedFile, userId, questionId));
     }
 
     @DeleteMapping("/v1/question/{question_id}/file/{file_id}")
@@ -38,7 +35,7 @@ public class FileHandler {
                                                   @PathVariable("file_id") @NotNull String fileId, Principal principal) throws FileException, QuestionException {
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
-        fileService.deleteFromQuestion(userId, questionId, fileId);
+        fileService.deleteFromS3(userId, questionId, fileId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
