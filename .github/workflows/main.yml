@@ -35,7 +35,6 @@ jobs:
       - name: Zip CodeDeploy Files and the Artifact
         run: |
           mkdir artifact
-          ls -la
           zip -r ${{env.ARTIFACT_NAME}} ./target/project-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
           mv ${{env.ARTIFACT_NAME}} artifact/
       - name: Copy Zip File to S3
