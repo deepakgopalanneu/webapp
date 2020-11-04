@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir artifact
           ls -la
-          zip -r ${{env.ARTIFACT_NAME}} webapp/target/project-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
+          zip -r ${{env.ARTIFACT_NAME}} ./target/project-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
           mv ${{env.ARTIFACT_NAME}} artifact/
           cd artifact
           ls -la
