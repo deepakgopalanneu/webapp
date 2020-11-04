@@ -79,7 +79,7 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(error);
         if (error.getErrormessage().equals(CustomStrings.file_notfound))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-        if(error.getErrormessage().equals(CustomStrings.file_exists))
+        if (error.getErrormessage().equals(CustomStrings.file_exists))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);

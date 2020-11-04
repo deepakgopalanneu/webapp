@@ -22,7 +22,6 @@ cloud:
     credentials:
       instanceProfile: true
       useDefaultAwsCredentialsChain: true
-    assumeRoleARN: arn:aws:iam::482505208893:role/EC2-CSYE6225
     s3:
       bucketname:${S3_BUCKET_NAME}
 
