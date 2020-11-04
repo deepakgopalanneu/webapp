@@ -4,9 +4,6 @@ os: linux
 files:
   - source: ./
     destination: /home/ubuntu
-permissions:
-  - object: /home/ubuntu/codedeploy/*
-    mode: 777
 hooks:
   ApplicationStart:
     - location: ./codedeploy/applicationStart.sh
