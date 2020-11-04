@@ -18,47 +18,26 @@ jobs:
     steps:
       - name: Checkout Code from Repo
         uses: actions/checkout@v2
-
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11.0.4
-
-#      - name: Install AWS CLI
-#        uses: chrislennon/action-aws-cli@v1.1
-
       - name: Run all Tests
         run: mvn test
-
       - name: Build
-        run: mvn package -Dmaven.test.skip=true
-
+        run: mvn clean install
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - name: Zip CodeDeploy Files and the Artifact
         run: |
           mkdir artifact
-          zip -r ${{env.ARTIFACT_NAME}} /target/project-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
+          zip -r ${{env.ARTIFACT_NAME}} ./target/project-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
           mv ${{env.ARTIFACT_NAME}} artifact/
-
       - name: Copy Zip File to S3
-        run: aws s3 sync ./artifact s3://${{ secrets.S3_CODEDEPLOY_BUCKET }}
-
+        run: aws s3 cp ./artifact/${{env.ARTIFACT_NAME}} s3://${{ secrets.S3_CODEDEPLOY_BUCKET }} --sse
       - name: CodeDeploy API call
-          run: |
-            output=$(aws deploy create-deployment \
-              --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} \
-              --deployment-config-name CodeDeployDefault.AllAtOnce \
-              --deployment-group-name ${{ env.CODEDEPLOY_APPLICATION_DEPLOYMNET_GROUP_NAME }} \
-              --s3-location bucket=${{ env.S3_CODEDEPLOY_BUCKET }},key=${{ env.ARTIFACT_NAME }},bundleType=zip \
-              --region ${{ env.AWS_REGION }} \
-              --output json)
-              echo $output
-              dId=$(echo $output | jq -r '.deploymentId')
-              aws deploy wait deployment-successful --deployment-id $dId
-# --s3-location bucket=${{ secrets.S3_CODEDEPLOY_BUCKET }},key=${{ env.ARTIFACT_NAME }},bundleType=zip \
+        run: aws deploy create-deployment --application-name ${{ env.CODEDEPLOY_APPLICATION_NAME }} --deployment-config-name CodeDeployDefault.AllAtOnce  --deployment-group-name ${{ env.CODEDEPLOY_APPLICATION_DEPLOYMNET_GROUP_NAME }}  --s3-location bucket=${{ secrets.S3_CODEDEPLOY_BUCKET }},key=${{ env.ARTIFACT_NAME }},bundleType=zip  --region ${{ env.AWS_REGION }}
