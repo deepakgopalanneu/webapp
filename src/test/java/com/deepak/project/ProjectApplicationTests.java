@@ -119,13 +119,6 @@ class ProjectApplicationTests {
 
 
     @Test
-    public void extractEmailFromHeaderShouldDecodeCredentials() {
-
-        assertTrue(UserHandler.extractEmailFromHeader(header).equals(email));
-
-    }
-
-    @Test
     public void validatedUserShouldValidateFirstName() throws UserException {
         user = new User();
         user.setFirst_name(fname);
