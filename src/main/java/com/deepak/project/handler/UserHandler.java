@@ -2,21 +2,31 @@ package com.deepak.project.handler;
 
 import com.deepak.project.Exception.UserException;
 import com.deepak.project.model.User;
+import com.deepak.project.model.UserPrincipal;
 import com.deepak.project.service.UserService;
+import com.timgroup.statsd.StatsDClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.security.Principal;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
 @RestController
 public class UserHandler {
 
-    UserService userService;
+    private UserService userService;
+    private final static Logger logger = LoggerFactory.getLogger(UserHandler.class);
+
+    @Autowired
+    StatsDClient statsd;
 
     @Autowired
     public UserHandler(UserService service) {
@@ -65,16 +75,7 @@ public class UserHandler {
             throw new UserException("Invalid User Object Provided");
     }
 
-    /**
-     * @param value
-     * @return String email address decoded from the Authorization header
-     */
-    public static String extractEmailFromHeader(String value) {
 
-        String credentials = value.split(" ")[1];
-        String decodedCredentials = new String(Base64.getDecoder().decode(credentials));
-        return decodedCredentials.split(":")[0];
-    }
 
     /**
      * This method validates the input and persists in the Database
@@ -85,21 +86,25 @@ public class UserHandler {
      */
     @PostMapping("/v1/user")
     public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user) throws UserException {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(validatedUser(user)));
+        logger.info("Logging from /v1/user controller method");
+        long startTime = System.currentTimeMillis();
+        statsd.increment("endpoint.http.post.user");
+        User savedUser = userService.createUser(validatedUser(user));
+        long totalTime =System.currentTimeMillis() - startTime;
+        statsd.recordExecutionTime("timer.user.post",totalTime);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
     /**
      * This method analyzes the user and returns corresponding resource as response
      *
-     * @param value is the Basic Authorization String sent by Consumer
      * @return ResponseEntity with Body of type User
      * @throws UserException
      */
     @GetMapping("/v1/user/self")
-    public ResponseEntity<User> getUser(@RequestHeader("Authorization") @NotNull @Valid String value) throws UserException {
-
-        User u = userService.getUser(extractEmailFromHeader(value));
+    public ResponseEntity<User> getUser( Principal principal) throws UserException {
+        UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
+        User u = userService.getUser(userPrincipal.getUsername());
         if (null != u)
             return ResponseEntity.ok(u);
         else
@@ -107,15 +112,14 @@ public class UserHandler {
     }
 
     /**
-     * @param value is the Basic Authorization String sent by Consumer
      * @param user  RequestBody should contain a valid User Object
      * @return ResponseEntity with Body of type User
      * @throws UserException
      */
     @PutMapping("/v1/user/self")
-    public ResponseEntity putUser(@RequestHeader("Authorization") String value, @RequestBody @NotNull @Valid User user) throws UserException {
-
-        userService.putUser(extractEmailFromHeader(value), validatedUser(user));
+    public ResponseEntity putUser( Principal principal, @RequestBody @NotNull @Valid User user) throws UserException {
+        UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
+        userService.putUser(userPrincipal.getUsername(), validatedUser(user));
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

@@ -16,6 +16,7 @@ import com.deepak.project.repository.QuestionRepository;
 import com.deepak.project.util.CustomStrings;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +35,8 @@ public class FileService {
     private QuestionRepository questionRepo;
     @Autowired
     private FileRepository fileRepo;
-    private String bucketName = "webapp.deepak.gopalan";
+    @Value("cloud.aws.s3.bucketname")
+    private String bucketName ;
 
     public void checkForFileNameConflict(String s3ObjectName) throws FileException {
         Optional<File> Optionalfile= fileRepo.findByS3ObjectName(s3ObjectName);

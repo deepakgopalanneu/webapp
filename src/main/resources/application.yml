@@ -1,4 +1,12 @@
 spring:
+  profiles:
+    active: "aws"
+  main:
+    banner-mode: "off"
+
+---
+spring:
+  profiles: aws
   servlet:
     multipart:
       max-file-size: 2MB
@@ -22,9 +30,5 @@ cloud:
     credentials:
       instanceProfile: true
       useDefaultAwsCredentialsChain: true
-    assumeRoleARN: arn:aws:iam::482505208893:role/EC2-CSYE6225
     s3:
-      bucketname:${S3_BUCKET_NAME}
-
-
-
+      bucketname: ${S3_BUCKET_NAME}

@@ -21,8 +21,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11.0.4
-      - name: Run all Tests
-        run: mvn test
       - name: Build
         run: mvn clean install
       - name: Configure AWS credentials
@@ -34,7 +32,7 @@ jobs:
       - name: Zip CodeDeploy Files and the Artifact
         run: |
           mkdir artifact
-          zip -r ${{env.ARTIFACT_NAME}} ./target/project-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
+          zip -r ${{env.ARTIFACT_NAME}} ./target/project-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml config.json
           mv ${{env.ARTIFACT_NAME}} artifact/
       - name: Copy Zip File to S3
         run: aws s3 cp ./artifact/${{env.ARTIFACT_NAME}} s3://${{ secrets.S3_CODEDEPLOY_BUCKET }} --sse
