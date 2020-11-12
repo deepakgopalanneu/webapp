@@ -7,7 +7,6 @@ do
     then
         exit 0
     else
-        echo "check server is running?"
-        sleep 3s
+        echo "Rechecking Server Health status"
     fi
 done
