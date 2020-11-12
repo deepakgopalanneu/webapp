@@ -71,7 +71,7 @@ public class UserService {
             if (null != user)
                 return user;
             else
-                throw new UserException("User Not Found");
+                return null;
         } catch (Exception e) {
             throw new UserException(e.getMessage());
         }
@@ -94,14 +94,18 @@ public class UserService {
         }
         try {
             savedUser = getUser(email);
-            savedUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            savedUser.setAccount_updated(LocalDateTime.now().toString());
-            savedUser.setLast_name(user.getLast_name());
-            savedUser.setFirst_name(user.getFirst_name());
-            long startTime = System.currentTimeMillis();
-            User u = userRepo.save(savedUser);
-            statsd.recordExecutionTime("DB ResponseTime - UPDATE USER", System.currentTimeMillis() - startTime);
-            return u;
+            if(null!=savedUser) {
+                savedUser.setPassword(passwordEncoder.encode(user.getPassword()));
+                savedUser.setAccount_updated(LocalDateTime.now().toString());
+                savedUser.setLast_name(user.getLast_name());
+                savedUser.setFirst_name(user.getFirst_name());
+                long startTime = System.currentTimeMillis();
+                User u = userRepo.save(savedUser);
+                statsd.recordExecutionTime("DB ResponseTime - UPDATE USER", System.currentTimeMillis() - startTime);
+                return u;
+            }else{
+                throw new UserException(CustomStrings.user_not_found);
+            }
         } catch (Exception ex) {
             throw new UserException(ex.getMessage());
         }
