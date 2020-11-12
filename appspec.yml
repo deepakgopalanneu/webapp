@@ -13,7 +13,7 @@ hooks:
     - location: ./codedeploy/applicationStop.sh
       timeout: 180
       runas: ubuntu
-#  ValidateService:
-#    - location: ./codedeploy/validate.sh
-#      timeout: 60
-#      runas: ubuntu
+  ValidateService:
+    - location: ./codedeploy/validate.sh
+      timeout: 60
+      runas: ubuntu
