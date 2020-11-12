@@ -33,7 +33,7 @@ public class FileService {
     private final AmazonS3 amazonS3;
     private final QuestionRepository questionRepo;
     private final FileRepository fileRepo;
-    @Value("cloud.aws.s3.bucketname")
+    @Value("${cloud.aws.s3.bucketname}")
     private String bucketName;
 
     public FileService(AnswerRepository answerRepo, AmazonS3 amazonS3, QuestionRepository questionRepo, FileRepository fileRepo) {
@@ -155,13 +155,13 @@ public class FileService {
         metaData.setContentLength(uploadedFile.getSize());
         String s3ObjectName = validateFileExtensionAndGenerateS3ObjectName(uploadedFile, questionOrAnswerId);
         checkForFileNameConflict(s3ObjectName);
-        java.io.File fileToSave = convertMultipartFileToFile(uploadedFile);
+//        java.io.File fileToSave = convertMultipartFileToFile(uploadedFile);
         try {
-            amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName, fileToSave)
-                    .withCannedAcl(CannedAccessControlList.PublicRead)
-                    .withMetadata(metaData));
-            fileToSave.delete();
-        }catch (SdkClientException e) {
+            amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName, uploadedFile.getInputStream(), metaData)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+//                    .withMetadata(metaData));
+//            fileToSave.delete();
+        }catch (SdkClientException | IOException e) {
             throw new FileException(CustomStrings.s3_save_error, e.getLocalizedMessage());
         }
         return s3ObjectName;
@@ -182,17 +182,17 @@ public class FileService {
         }
     }
 
-    public java.io.File convertMultipartFileToFile(MultipartFile uploadedFile) throws FileException {
-        java.io.File convFile = new java.io.File(uploadedFile.getOriginalFilename());
-        try {
-            FileOutputStream fos = new FileOutputStream(convFile);
-            fos.write(uploadedFile.getBytes());
-            fos.close();
-        } catch (Exception e) {
-            throw new FileException(CustomStrings.file_conversion_error , e.getLocalizedMessage());
-        }
-        return convFile;
-    }
+//    public java.io.File convertMultipartFileToFile(MultipartFile uploadedFile) throws FileException {
+//        java.io.File convFile = new java.io.File(uploadedFile.getOriginalFilename());
+//        try {
+//            FileOutputStream fos = new FileOutputStream(convFile);
+//            fos.write(uploadedFile.getBytes());
+//            fos.close();
+//        } catch (Exception e) {
+//            throw new FileException(CustomStrings.file_conversion_error , e.getLocalizedMessage());
+//        }
+//        return convFile;
+//    }
 
     public void verifyUserHasPermissionToModifyResource(String userId, String actualUser) throws QuestionException {
 
