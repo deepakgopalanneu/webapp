@@ -123,6 +123,12 @@ public class UserHandler {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    /**
+     * This method is used to retrieve user info by Id - does not require authentication
+     * @param id
+     * @return User with the given Id
+     * @throws UserException
+     */
     @GetMapping("/v1/user/{id}")
     public ResponseEntity<User> getUnknownUser(@PathVariable("id") @NotNull String id) throws UserException {
         return ResponseEntity.ok(userService.getUnknownUser(id));
