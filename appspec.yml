@@ -17,7 +17,7 @@ hooks:
 #    - location: server/install-packages.sh
 #      timeout: 120
 #      runas: ubuntu
-  ValidateService:
-    - location: ./codedeploy/validate.sh
-      timeout: 120
-      runas: ubuntu
+#  ValidateService:
+#    - location: ./codedeploy/validate.sh
+#      timeout: 120
+#      runas: ubuntu
