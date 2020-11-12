@@ -14,7 +14,10 @@ import com.deepak.project.repository.AnswerRepository;
 import com.deepak.project.repository.FileRepository;
 import com.deepak.project.repository.QuestionRepository;
 import com.deepak.project.util.CustomStrings;
+import com.timgroup.statsd.StatsDClient;
 import org.apache.tika.Tika;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,16 +38,20 @@ public class FileService {
     private final FileRepository fileRepo;
     @Value("${cloud.aws.s3.bucketname}")
     private String bucketName;
+    private final static Logger logger = LoggerFactory.getLogger(QuestionService.class);
+    StatsDClient statsd;
 
-    public FileService(AnswerRepository answerRepo, AmazonS3 amazonS3, QuestionRepository questionRepo, FileRepository fileRepo) {
+    @Autowired
+    public FileService(AnswerRepository answerRepo, AmazonS3 amazonS3, QuestionRepository questionRepo, FileRepository fileRepo, StatsDClient statsd) {
         this.answerRepo = answerRepo;
         this.amazonS3 = amazonS3;
         this.questionRepo = questionRepo;
         this.fileRepo = fileRepo;
+        this.statsd = statsd;
     }
 
     public File saveFileToQuestion(MultipartFile uploadedFile, String userId, String questionId) throws FileException, QuestionException {
-
+        logger.info("Logging from SAVE FILE to Question service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Question question = fetchedQuestion.get();
@@ -63,6 +70,7 @@ public class FileService {
 
 
     public File saveFileToAnswer(MultipartFile uploadedFile, String userId, String questionId, String answerId) throws QuestionException, FileException {
+        logger.info("Logging from SAVE FILE to Answer service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Optional<Answer> fetchedAnswer = answerRepo.findById(answerId);
@@ -84,7 +92,7 @@ public class FileService {
     }
 
     public void deleteFromQuestion(String userId, String questionId, String fileId) throws QuestionException, FileException {
-
+        logger.info("Logging from DELETE FILE from Question service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Question question = fetchedQuestion.get();
@@ -103,6 +111,7 @@ public class FileService {
     }
 
     public void deleteFromAnswer(String userId, String questionId, String answerId, String fileId) throws QuestionException, FileException {
+        logger.info("Logging from DELETE FILE from Answer service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Optional<Answer> fetchedAnswer = answerRepo.findById(answerId);
@@ -134,7 +143,10 @@ public class FileService {
         else
             file.setAnswer_id(questionOrAnswerId);
         try {
-            return fileRepo.save(file);
+            long startTime = System.currentTimeMillis();
+            File f = fileRepo.save(file);
+            statsd.recordExecutionTime("DB ResponseTime - SAVE File", System.currentTimeMillis() - startTime);
+            return f;
         } catch (Exception e) {
             deleteImageBys3ObjectName(s3ObjectName);
             throw new FileException(CustomStrings.rds_save_error , e.getLocalizedMessage());
@@ -143,7 +155,9 @@ public class FileService {
 
     public void deleteFileFromDB(String fileId) throws FileException {
         try {
+            long startTime = System.currentTimeMillis();
             fileRepo.deleteById(fileId);
+            statsd.recordExecutionTime("DB ResponseTime - Delete File", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
             throw new FileException(CustomStrings.rds_delete_error, e.getLocalizedMessage());
         }
@@ -157,10 +171,12 @@ public class FileService {
         checkForFileNameConflict(s3ObjectName);
 //        java.io.File fileToSave = convertMultipartFileToFile(uploadedFile);
         try {
+            long startTime = System.currentTimeMillis();
             amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName, uploadedFile.getInputStream(), metaData)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 //                    .withMetadata(metaData));
 //            fileToSave.delete();
+            statsd.recordExecutionTime("S3 ResponseTime - SAVE File to S3", System.currentTimeMillis() - startTime);
         }catch (SdkClientException | IOException e) {
             throw new FileException(CustomStrings.s3_save_error, e.getLocalizedMessage());
         }
@@ -168,7 +184,9 @@ public class FileService {
     }
     public void deleteImageBys3ObjectName(String s3ObjectName) throws FileException {
         try {
+            long startTime = System.currentTimeMillis();
             amazonS3.deleteObject(bucketName, s3ObjectName);
+            statsd.recordExecutionTime("S3 ResponseTime - DELETE File FROM S3", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
             throw new FileException(CustomStrings.s3_delete_error, e.getMessage());
         }

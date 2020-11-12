@@ -24,13 +24,12 @@ public class UserHandler {
 
     private UserService userService;
     private final static Logger logger = LoggerFactory.getLogger(UserHandler.class);
-
-    @Autowired
     StatsDClient statsd;
 
     @Autowired
-    public UserHandler(UserService service) {
-        this.userService = service;
+    public UserHandler(UserService userService, StatsDClient statsd) {
+        this.userService = userService;
+        this.statsd = statsd;
     }
 
     /**
@@ -86,12 +85,11 @@ public class UserHandler {
      */
     @PostMapping("/v1/user")
     public ResponseEntity<User> createUser(@RequestBody @NotNull @Valid User user) throws UserException {
-        logger.info("Logging from /v1/user controller method");
+        logger.info("Logging from POST /v1/user controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("endpoint.http.post.user");
+        statsd.increment("Traffic - POST /v1/user");
         User savedUser = userService.createUser(validatedUser(user));
-        long totalTime =System.currentTimeMillis() - startTime;
-        statsd.recordExecutionTime("timer.user.post",totalTime);
+        statsd.recordExecutionTime("ResponseTime - GET /v1/user/self",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
@@ -103,12 +101,14 @@ public class UserHandler {
      */
     @GetMapping("/v1/user/self")
     public ResponseEntity<User> getUser( Principal principal) throws UserException {
+        logger.info("Logging from GET /v1/user/self controller method");
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Traffic - GET /v1/user/self");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         User u = userService.getUser(userPrincipal.getUsername());
-        if (null != u)
-            return ResponseEntity.ok(u);
-        else
-            throw new UserException("User Not Found");
+        statsd.recordExecutionTime("ResponseTime - GET /v1/user/self", System.currentTimeMillis() - startTime);
+        return ResponseEntity.ok(u);
+
     }
 
     /**
@@ -118,8 +118,12 @@ public class UserHandler {
      */
     @PutMapping("/v1/user/self")
     public ResponseEntity putUser( Principal principal, @RequestBody @NotNull @Valid User user) throws UserException {
+        logger.info("Logging from PUT /v1/user/self controller method");
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Traffic - PUT /v1/user/self");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         userService.putUser(userPrincipal.getUsername(), validatedUser(user));
+        statsd.recordExecutionTime("ResponseTime - PUT /v1/user/self", System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -131,6 +135,11 @@ public class UserHandler {
      */
     @GetMapping("/v1/user/{id}")
     public ResponseEntity<User> getUnknownUser(@PathVariable("id") @NotNull String id) throws UserException {
-        return ResponseEntity.ok(userService.getUnknownUser(id));
+        logger.info("Logging from GET /v1/user/{id} controller method");
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Traffic to GET /v1/user/{id}");
+        User u = userService.getUnknownUser(id);
+        statsd.recordExecutionTime("ResponseTime - GET /v1/user/self", System.currentTimeMillis() - startTime);
+        return ResponseEntity.ok(u);
     }
 }
