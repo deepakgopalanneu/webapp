@@ -14,7 +14,7 @@ hooks:
       timeout: 180
       runas: ubuntu
   AfterInstall:
-    - location: server/install-packages.sh
+    - location: server/afterInstall.sh
       timeout: 120
       runas: ubuntu
 #  ValidateService:
