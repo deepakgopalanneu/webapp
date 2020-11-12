@@ -89,7 +89,7 @@ public class UserHandler {
         long startTime = System.currentTimeMillis();
         statsd.increment("Traffic - POST /v1/user");
         User savedUser = userService.createUser(validatedUser(user));
-        statsd.recordExecutionTime("ResponseTime - GET /v1/user/self",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("ResponseTime - GET /v1/user",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
@@ -139,7 +139,7 @@ public class UserHandler {
         long startTime = System.currentTimeMillis();
         statsd.increment("Traffic to GET /v1/user/{id}");
         User u = userService.getUnknownUser(id);
-        statsd.recordExecutionTime("ResponseTime - GET /v1/user/self", System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("ResponseTime - GET /v1/user/{id}}", System.currentTimeMillis() - startTime);
         return ResponseEntity.ok(u);
     }
 }
