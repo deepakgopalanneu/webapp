@@ -53,7 +53,7 @@ public class UserService {
             try {
                 u = userRepo.save(user);
             }catch (ConstraintViolationException e){
-                throw new UserException("Conflict - Email address already in use");
+                throw new UserException(CustomStrings.user_conflict);
             }
             statsd.recordExecutionTime("DB ResponseTime - POST USER", System.currentTimeMillis() - startTime);
             return u;

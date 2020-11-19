@@ -41,7 +41,8 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
         error.setErrormessage(ex.getMessage());
         if (error.getErrormessage().equals(CustomStrings.user_not_found))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-
+        if (error.getErrormessage().equals(CustomStrings.user_conflict))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
