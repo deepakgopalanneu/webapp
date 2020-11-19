@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -51,7 +51,7 @@ public class FileService {
     }
 
     public File saveFileToQuestion(MultipartFile uploadedFile, String userId, String questionId) throws FileException, QuestionException {
-        logger.info("Logging from SAVE FILE to Question service method");
+        logger.info("Entering POST FILE_TO_QUESTION service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Question question = fetchedQuestion.get();
@@ -70,7 +70,7 @@ public class FileService {
 
 
     public File saveFileToAnswer(MultipartFile uploadedFile, String userId, String questionId, String answerId) throws QuestionException, FileException {
-        logger.info("Logging from SAVE FILE to Answer service method");
+        logger.info("Entering SAVE FILE_TO_ANSWER service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Optional<Answer> fetchedAnswer = answerRepo.findById(answerId);
@@ -92,7 +92,7 @@ public class FileService {
     }
 
     public void deleteFromQuestion(String userId, String questionId, String fileId) throws QuestionException, FileException {
-        logger.info("Logging from DELETE FILE from Question service method");
+        logger.info("Entering DELETE FILE_FROM_QUESTION service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Question question = fetchedQuestion.get();
@@ -111,7 +111,7 @@ public class FileService {
     }
 
     public void deleteFromAnswer(String userId, String questionId, String answerId, String fileId) throws QuestionException, FileException {
-        logger.info("Logging from DELETE FILE from Answer service method");
+        logger.info("Entering DELETE FILE_FROM_ANSWER service method");
         Optional<Question> fetchedQuestion = questionRepo.findById(questionId);
         if (fetchedQuestion.isPresent()) {
             Optional<Answer> fetchedAnswer = answerRepo.findById(answerId);
@@ -145,7 +145,7 @@ public class FileService {
         try {
             long startTime = System.currentTimeMillis();
             File f = fileRepo.save(file);
-            statsd.recordExecutionTime("DB ResponseTime - SAVE File", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("DB ResponseTime - SAVE FILE", System.currentTimeMillis() - startTime);
             return f;
         } catch (Exception e) {
             deleteImageBys3ObjectName(s3ObjectName);
@@ -157,7 +157,7 @@ public class FileService {
         try {
             long startTime = System.currentTimeMillis();
             fileRepo.deleteById(fileId);
-            statsd.recordExecutionTime("DB ResponseTime - Delete File", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("DB ResponseTime - DELETE FILE", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
             throw new FileException(CustomStrings.rds_delete_error, e.getLocalizedMessage());
         }
@@ -169,14 +169,11 @@ public class FileService {
         metaData.setContentLength(uploadedFile.getSize());
         String s3ObjectName = validateFileExtensionAndGenerateS3ObjectName(uploadedFile, questionOrAnswerId);
         checkForFileNameConflict(s3ObjectName);
-//        java.io.File fileToSave = convertMultipartFileToFile(uploadedFile);
         try {
             long startTime = System.currentTimeMillis();
             amazonS3.putObject(new PutObjectRequest(bucketName, s3ObjectName, uploadedFile.getInputStream(), metaData)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
-//                    .withMetadata(metaData));
-//            fileToSave.delete();
-            statsd.recordExecutionTime("S3 ResponseTime - SAVE File to S3", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("S3 ResponseTime - SAVE FILE to S3", System.currentTimeMillis() - startTime);
         }catch (SdkClientException | IOException e) {
             throw new FileException(CustomStrings.s3_save_error, e.getLocalizedMessage());
         }
@@ -186,7 +183,7 @@ public class FileService {
         try {
             long startTime = System.currentTimeMillis();
             amazonS3.deleteObject(bucketName, s3ObjectName);
-            statsd.recordExecutionTime("S3 ResponseTime - DELETE File FROM S3", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("S3 ResponseTime - DELETE FILE FROM S3", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
             throw new FileException(CustomStrings.s3_delete_error, e.getMessage());
         }
@@ -199,18 +196,6 @@ public class FileService {
             throw new FileException(CustomStrings.file_exists);
         }
     }
-
-//    public java.io.File convertMultipartFileToFile(MultipartFile uploadedFile) throws FileException {
-//        java.io.File convFile = new java.io.File(uploadedFile.getOriginalFilename());
-//        try {
-//            FileOutputStream fos = new FileOutputStream(convFile);
-//            fos.write(uploadedFile.getBytes());
-//            fos.close();
-//        } catch (Exception e) {
-//            throw new FileException(CustomStrings.file_conversion_error , e.getLocalizedMessage());
-//        }
-//        return convFile;
-//    }
 
     public void verifyUserHasPermissionToModifyResource(String userId, String actualUser) throws QuestionException {
 

@@ -44,13 +44,13 @@ public class FileHandler {
     @PostMapping("/v1/question/{question_id}/file")
     public ResponseEntity<File> postImageToQuestion(@RequestPart @NotNull MultipartFile uploadedFile,
                                                     @PathVariable("question_id") @NotNull String questionId, Principal principal) throws FileException, QuestionException {
-        logger.info("Logging from POST /v1/question/{id}/file controller method");
+        logger.info("Entering POST FILE_TO_QUESTION controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - POST /v1/question/{id}/file");
+        statsd.increment("Traffic - POST FILE_TO_QUESTION");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         File f = fileService.saveFileToQuestion(uploadedFile, userId, questionId);
-        statsd.recordExecutionTime("ResponseTime - POST /v1/question/{id}/file",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - POST FILE_TO_QUESTION",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.CREATED).body(f);
     }
 
@@ -66,13 +66,13 @@ public class FileHandler {
     @DeleteMapping("/v1/question/{question_id}/file/{file_id}")
     public ResponseEntity deleteImageFromQuestion(@PathVariable("question_id") @NotNull String questionId,
                                                   @PathVariable("file_id") @NotNull String fileId, Principal principal) throws FileException, QuestionException {
-        logger.info("Logging from DELETE /v1/question/{id}/file/{id} controller method");
+        logger.info("Entering DELETE FILE_FROM_QUESTION controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - DELETE /v1/question/{id}/file/{id}");
+        statsd.increment("Traffic - DELETE FILE_FROM_QUESTION");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         fileService.deleteFromQuestion(userId, questionId, fileId);
-        statsd.recordExecutionTime("ResponseTime - DELETE /v1/question/{id}/file/{id}",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - DELETE FILE_FROM_QUESTION",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -89,13 +89,13 @@ public class FileHandler {
     @PostMapping("/v1/question/{question_id}/answer/{answer_id}/file")
     public ResponseEntity<File> postImageToAnswer(@RequestPart @NotNull MultipartFile uploadedFile, @PathVariable("answer_id") @NotNull String answerId,
                                                   @PathVariable("question_id") @NotNull String questionId, Principal principal) throws FileException, QuestionException {
-        logger.info("Logging from POST /v1/question/{id}/answer/{id}/file controller method");
+        logger.info("Entering POST FILE_TO_ANSWER controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - POST /v1/question/{id}/answer/{id}/file");
+        statsd.increment("Traffic - POST FILE_TO_ANSWER");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         File f = fileService.saveFileToAnswer(uploadedFile, userId, questionId, answerId);
-        statsd.recordExecutionTime("ResponseTime - POST /v1/question/{id}/answer/{id}/file",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - POST FILE_TO_ANSWER",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.CREATED).body(f);
     }
 
@@ -112,13 +112,13 @@ public class FileHandler {
     @DeleteMapping("/v1/question/{question_id}/answer/{answer_id}/file/{file_id}")
     public ResponseEntity deleteImageFromAnswer(@PathVariable("question_id") @NotNull String questionId, @PathVariable("answer_id") @NotNull String answerId,
                                                 @PathVariable("file_id") @NotNull String fileId, Principal principal) throws FileException, QuestionException {
-        logger.info("Logging from DELETE /v1/question/{id}/answer/{id}/file/{id} controller method");
+        logger.info("Entering DELETE FILE_FROM_ANSWER controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - DELETE /v1/question/{id}/answer/{id}/file/{id}");
+        statsd.increment("Traffic - DELETE FILE_FROM_ANSWER");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         fileService.deleteFromAnswer(userId, questionId, answerId, fileId);
-        statsd.recordExecutionTime("ResponseTime - DELETE /v1/question/{id}/answer/{id}/file/{id}",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - DELETE FILE_FROM_ANSWER",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

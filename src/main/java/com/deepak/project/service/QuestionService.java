@@ -46,6 +46,14 @@ public class QuestionService {
         this.statsd = statsd;
     }
 
+    /**
+     * This predicate helps to filter out unique items in a list
+     * in this case, we use this to filter repeated categories from questions
+     *
+     * @param keyExtractor - pass the attribute based on which you want to filter the stream
+     * @param <T>
+     * @return
+     */
     public static <T> Predicate<T> distinctByKey(
             Function<? super T, ?> keyExtractor) {
 
@@ -53,8 +61,18 @@ public class QuestionService {
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
+    /**
+     * this method checks all the categories on the questions to be saved.
+     * removes duplicate categories and saves new categories
+     * then saves the question to DB
+     *
+     * @param question
+     * @param userId
+     * @return
+     * @throws QuestionException
+     */
     public Question createQuestion(Question question, String userId) throws QuestionException {
-        logger.info("Logging from CREATE Question service method");
+        logger.info("Entering CREATE QUESTION service method");
         question.setCreated_timestamp(LocalDateTime.now().toString());
         question.setUpdated_timestamp(LocalDateTime.now().toString());
         question.setUserId(userId);
@@ -97,8 +115,18 @@ public class QuestionService {
         }
     }
 
+    /**
+     * This method checks if a Question exists for given questionId
+     * If yes, saves a new Answer to that Question
+     *
+     * @param question_id
+     * @param userId
+     * @param answer_text
+     * @return
+     * @throws QuestionException
+     */
     public Answer answerQuestion(String question_id, String userId, String answer_text) throws QuestionException {
-        logger.info("Logging from CREATE ANSWER service method");
+        logger.info("Entering POST ANSWER service method");
         Answer answer = new Answer();
         answer.setAnswer_text(answer_text);
         answer.setUserId(userId);
@@ -110,18 +138,29 @@ public class QuestionService {
             long startTime = System.currentTimeMillis();
             Optional<Question> q = questionRepo.findById(question_id);
             if (q.isPresent()) {
-                Answer ans =  answerRepo.save(answer);
-                statsd.recordExecutionTime("DB ResponseTime - SAVE ANSWER", System.currentTimeMillis() - startTime);
+                Answer ans = answerRepo.save(answer);
+                statsd.recordExecutionTime("DB ResponseTime - POST ANSWER", System.currentTimeMillis() - startTime);
                 return ans;
-            }else
+            } else
                 throw new QuestionException(CustomStrings.not_found);
         } catch (Exception e) {
             throw new QuestionException(e.getMessage());
         }
     }
 
+    /**
+     * This method checks if question exists for given questionID
+     * removes duplicates for list of categories given, checks if the filtered categories already exists
+     * if not, saves the categories
+     * then updates the Question
+     *
+     * @param question
+     * @param question_id
+     * @param userId
+     * @throws QuestionException
+     */
     public void editQuestion(Question question, String question_id, String userId) throws QuestionException {
-        logger.info("Logging from EDIT Question service method");
+        logger.info("Entering PUT QUESTION service method");
         try {
             Optional<Question> foundQuestion = questionRepo.findById(question_id);
             if (foundQuestion.isPresent()) {
@@ -159,7 +198,7 @@ public class QuestionService {
                     q.setUpdated_timestamp(LocalDateTime.now().toString());
                     long startTime = System.currentTimeMillis();
                     questionRepo.save(q);
-                    statsd.recordExecutionTime("DB ResponseTime - EDIT ANSWER", System.currentTimeMillis() - startTime);
+                    statsd.recordExecutionTime("DB ResponseTime - PUT QUESTION", System.currentTimeMillis() - startTime);
                 }
             } else {
                 throw new QuestionException(CustomStrings.not_found);
@@ -169,9 +208,14 @@ public class QuestionService {
         }
     }
 
+    /**
+     * this method deletes each of the file in the given list from S3
+     *
+     * @param attachments - List of Files
+     */
     private void deleteImagesFromS3(List<File> attachments) {
-        logger.info("Logging from DELETE IMAGES FROM S3 when question is deleted - service method");
-        long startTime = System.currentTimeMillis();
+        logger.info("Entering DELETE FILE FROM S3 when question is deleted - service method");
+
         attachments.stream().forEach(f -> {
             try {
                 fileService.deleteImageBys3ObjectName(f.getS3ObjectName());
@@ -179,12 +223,23 @@ public class QuestionService {
                 throw new RuntimeException("Unable to Delete Images attached to this Question");
             }
         });
-        statsd.recordExecutionTime("S3 ResponseTime - DELETE File FROM S3", System.currentTimeMillis() - startTime);
+
 
     }
 
+    /**
+     * ensures given question exists
+     * ensures user is authorized to delete the question
+     * ensures question does not have any answers attached to it
+     * deletes all the files atatched to question, if any
+     * then deletes the question from DB
+     *
+     * @param question_id
+     * @param userId
+     * @throws QuestionException
+     */
     public void deleteQuestion(String question_id, String userId) throws QuestionException {
-        logger.info("Logging from DELETE Question service method");
+        logger.info("Entering DELETE QUESTION service method");
         try {
             Optional<Question> foundQuestion = questionRepo.findById(question_id);
             if (foundQuestion.isPresent()) {
@@ -198,7 +253,7 @@ public class QuestionService {
                     }
                     long startTime = System.currentTimeMillis();
                     questionRepo.deleteById(question_id);
-                    statsd.recordExecutionTime("DB ResponseTime - DELETE Question", System.currentTimeMillis() - startTime);
+                    statsd.recordExecutionTime("DB ResponseTime - DELETE QUESTION", System.currentTimeMillis() - startTime);
 
                 } else {
                     throw new QuestionException("You cannot delete a Question which has answers");
@@ -211,8 +266,19 @@ public class QuestionService {
         }
     }
 
+    /**
+     * ensures Question exists for given questionId
+     * ensures Answer exists for given answerId
+     * ensure User is authorized to update answer
+     *
+     * @param question_id
+     * @param answer_id
+     * @param answer_text
+     * @param userId
+     * @throws QuestionException
+     */
     public void updateAnswer(String question_id, String answer_id, String answer_text, String userId) throws QuestionException {
-        logger.info("Logging from UPDATE Answer service method");
+        logger.info("Entering PUT ANSWER service method");
         try {
             Optional<Question> questOptional = questionRepo.findById(question_id);
             Answer ans = null;
@@ -228,7 +294,7 @@ public class QuestionService {
                         ans.setUpdated_timestamp(LocalDateTime.now().toString());
                         long startTime = System.currentTimeMillis();
                         answerRepo.save(ans);
-                        statsd.recordExecutionTime("DB ResponseTime - UPDATE Answer", System.currentTimeMillis() - startTime);
+                        statsd.recordExecutionTime("DB ResponseTime - PUT ANSWER", System.currentTimeMillis() - startTime);
 
                     }
                 } else {
@@ -242,8 +308,19 @@ public class QuestionService {
         }
     }
 
+    /**
+     * ensures question exists for given questionId
+     * ensures answer exists for given answerId
+     * ensures User is authorized to delete the answer
+     * deletes all files attached to the answer
+     * deletes the answer from DB
+     * @param answer_id
+     * @param question_id
+     * @param userId
+     * @throws QuestionException
+     */
     public void deleteAnswer(String answer_id, String question_id, String userId) throws QuestionException {
-        logger.info("Logging from DELETE Answer service method");
+        logger.info("Entering DELETE ANSWER service method");
         try {
             Optional<Question> questOptional = questionRepo.findById(question_id);
             Answer ans;
@@ -259,7 +336,7 @@ public class QuestionService {
                             deleteImagesFromS3(ans.getAttachments());
                         long startTime = System.currentTimeMillis();
                         answerRepo.deleteById(ans.getAnswer_id());
-                        statsd.recordExecutionTime("DB ResponseTime - DELETE Answer", System.currentTimeMillis() - startTime);
+                        statsd.recordExecutionTime("DB ResponseTime - DELETE ANSWER", System.currentTimeMillis() - startTime);
 
                     }
                 } else {
@@ -273,8 +350,14 @@ public class QuestionService {
         }
     }
 
+    /**
+     * Fetches Question form DB for the given questionId
+     * @param question_id
+     * @return
+     * @throws QuestionException
+     */
     public Question getQuestion(String question_id) throws QuestionException {
-        logger.info("Logging from GET Question service method");
+        logger.info("Entering GET QUESTION service method");
         try {
             long startTime = System.currentTimeMillis();
             Optional<Question> foundQuestion = questionRepo.findById(question_id);
@@ -290,12 +373,17 @@ public class QuestionService {
         }
     }
 
+    /**
+     * Fetches all the questions stored in the DB
+     * @return
+     * @throws QuestionException
+     */
     public List<Question> getAllQuestions() throws QuestionException {
-        logger.info("Logging from GET ALL Questions service method");
+        logger.info("Entering GET ALL QUESTIONS service method");
         try {
             long startTime = System.currentTimeMillis();
             List<Question> foundQuestions = (List<Question>) questionRepo.findAll();
-            statsd.recordExecutionTime("DB ResponseTime - GET ALL Questions", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("DB ResponseTime - GET ALL QUESTIONS", System.currentTimeMillis() - startTime);
             if (foundQuestions.isEmpty()) {
                 throw new QuestionException(CustomStrings.not_found);
             } else {
@@ -306,12 +394,18 @@ public class QuestionService {
         }
     }
 
+    /**
+     * Fetches the Answer from DB for given answerId
+     * @param answer_id
+     * @return
+     * @throws QuestionException
+     */
     public Answer getAnswer(String answer_id) throws QuestionException {
-        logger.info("Logging from GET Answer service method");
+        logger.info("Entering GET ANSWER service method");
         try {
             long startTime = System.currentTimeMillis();
             Optional<Answer> foundAnswer = answerRepo.findById(answer_id);
-            statsd.recordExecutionTime("DB ResponseTime - GET Answer", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("DB ResponseTime - GET ANSWER", System.currentTimeMillis() - startTime);
             if (foundAnswer.isPresent()) {
                 Answer ans = foundAnswer.get();
                 return ans;
