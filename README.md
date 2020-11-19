@@ -1,4 +1,4 @@
-# Webapp 
+# Webapp   
 
 ## Prerequisites to run locally
 1. install Java version 8 or above
