@@ -42,7 +42,7 @@ public class FileHandler {
      * @throws QuestionException
      */
     @PostMapping("/v1/question/{question_id}/file")
-    public ResponseEntity<File> postImageToQuestion(@RequestParam("uploadedFile") @NotNull MultipartFile uploadedFile,
+    public ResponseEntity<File> postImageToQuestion(@RequestPart(value="uploadedFile") @NotNull MultipartFile uploadedFile,
                                                     @PathVariable("question_id") @NotNull String questionId, Principal principal) throws FileException, QuestionException {
         logger.info("Entering POST FILE_TO_QUESTION controller method");
         long startTime = System.currentTimeMillis();
@@ -87,7 +87,7 @@ public class FileHandler {
      * @throws QuestionException
      */
     @PostMapping("/v1/question/{question_id}/answer/{answer_id}/file")
-    public ResponseEntity<File> postImageToAnswer(@RequestPart @NotNull MultipartFile uploadedFile, @PathVariable("answer_id") @NotNull String answerId,
+    public ResponseEntity<File> postImageToAnswer(@RequestPart(value="uploadedFile") @NotNull MultipartFile uploadedFile, @PathVariable("answer_id") @NotNull String answerId,
                                                   @PathVariable("question_id") @NotNull String questionId, Principal principal) throws FileException, QuestionException {
         logger.info("Entering POST FILE_TO_ANSWER controller method");
         long startTime = System.currentTimeMillis();
