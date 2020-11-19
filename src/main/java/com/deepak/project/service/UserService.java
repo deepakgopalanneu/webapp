@@ -5,6 +5,7 @@ import com.deepak.project.model.User;
 import com.deepak.project.repository.UserRepository;
 import com.deepak.project.util.CustomStrings;
 import com.timgroup.statsd.StatsDClient;
+import org.hibernate.NonUniqueObjectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,12 @@ public class UserService {
             user.setAccount_created(LocalDateTime.now().toString());
             user.setAccount_updated(LocalDateTime.now().toString());
             long startTime = System.currentTimeMillis();
-            User u = userRepo.save(user);
+            User u = null;
+            try {
+                u = userRepo.save(user);
+            }catch (NonUniqueObjectException e){
+                throw new UserException("Conflict - Email address already in use");
+            }
             statsd.recordExecutionTime("DB ResponseTime - POST USER", System.currentTimeMillis() - startTime);
             return u;
         } catch (Exception e) {

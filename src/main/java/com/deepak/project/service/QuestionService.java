@@ -94,19 +94,17 @@ public class QuestionService {
                 boolean b = m.find();
                 if (b)
                     throw new RuntimeException("Category cannot have special characters");
-                List<Category> existingCategories = categoryRepo.findByCategory(categoryName);
-                Category existingCategory = null;
-                if (null != existingCategories && existingCategories.size() < 1) {
-                    existingCategory = existingCategories.get(0);
-                }
-                if (null != existingCategory)
-                    categoryList.add(existingCategory);
+                Category c = categoryRepo.findByCategory(categoryName);
+                if (null != c)
+                    categoryList.add(c);
                 else {
                     Category addCategory = new Category();
                     addCategory.setCategory(categoryName);
-                    categoryList.add(categoryRepo.save(addCategory));
-                }
+                    try {
+                        categoryList.add( categoryRepo.save(addCategory));
+                    }catch (Exception e){}
 
+                }
             });
             question.setCategories(categoryList);
             question.setAnswers(new ArrayList<>());
@@ -189,17 +187,15 @@ public class QuestionService {
                         boolean b = m.find();
                         if (b)
                             throw new RuntimeException("Category cannot have special characters");
-                        List<Category> existingCategories = categoryRepo.findByCategory(categoryName);
-                        Category existingCategory = null;
-                        if (null != existingCategories && existingCategories.size() < 1) {
-                            existingCategory = existingCategories.get(0);
-                        }
-                        if (null != existingCategory)
-                            categoryList.add(existingCategory);
+                        Category c = categoryRepo.findByCategory(categoryName);
+                        if (null != c)
+                            categoryList.add(c);
                         else {
                             Category addCategory = new Category();
                             addCategory.setCategory(categoryName);
-                            categoryList.add(categoryRepo.save(addCategory));
+                            try {
+                                categoryList.add( categoryRepo.save(addCategory));
+                            }catch (Exception e){}
                         }
                     });
                     q.setCategories(categoryList);
@@ -323,7 +319,6 @@ public class QuestionService {
      * ensures User is authorized to delete the answer
      * deletes all files attached to the answer
      * deletes the answer from DB
-     *
      * @param answer_id
      * @param question_id
      * @param userId
@@ -362,7 +357,6 @@ public class QuestionService {
 
     /**
      * Fetches Question form DB for the given questionId
-     *
      * @param question_id
      * @return
      * @throws QuestionException
@@ -386,7 +380,6 @@ public class QuestionService {
 
     /**
      * Fetches all the questions stored in the DB
-     *
      * @return
      * @throws QuestionException
      */
@@ -408,7 +401,6 @@ public class QuestionService {
 
     /**
      * Fetches the Answer from DB for given answerId
-     *
      * @param answer_id
      * @return
      * @throws QuestionException
