@@ -43,7 +43,7 @@ public class UserService {
         try {
             User userExistsForUpdatedEmail = getUser(user.getUsername());
             if (null != userExistsForUpdatedEmail)
-                throw new UserException("Conflict - Email address already in use");
+                throw new UserException(CustomStrings.user_conflict);
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setAccount_created(LocalDateTime.now().toString());
@@ -52,7 +52,7 @@ public class UserService {
             User u = null;
             try {
                 u = userRepo.save(user);
-            }catch (ConstraintViolationException e){
+            }catch (Exception e){
                 throw new UserException(CustomStrings.user_conflict);
             }
             statsd.recordExecutionTime("DB ResponseTime - POST USER", System.currentTimeMillis() - startTime);
