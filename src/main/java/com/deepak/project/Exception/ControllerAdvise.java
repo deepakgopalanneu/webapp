@@ -98,7 +98,13 @@ public class ControllerAdvise extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleAllUnexpectedExceptions(Exception ex) {
+        Error error = new Error();
+        error.setErrormessage(ex.getMessage());
+        error.setDescription(ex.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return commonhandler(ex, status);
