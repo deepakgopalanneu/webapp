@@ -37,7 +37,7 @@ public class UserService {
      * @throws UserException
      */
     public User createUser(User user) throws UserException {
-        logger.info("Logging from CREATE USER service method");
+        logger.info("Entering POST USER service method");
         try {
             User userExistsForUpdatedEmail = getUser(user.getUsername());
             if (null != userExistsForUpdatedEmail)
@@ -48,7 +48,7 @@ public class UserService {
             user.setAccount_updated(LocalDateTime.now().toString());
             long startTime = System.currentTimeMillis();
             User u = userRepo.save(user);
-            statsd.recordExecutionTime("DB ResponseTime - SAVE USER", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("DB ResponseTime - POST USER", System.currentTimeMillis() - startTime);
             return u;
         } catch (Exception e) {
             throw new UserException(e.getMessage());
@@ -63,7 +63,7 @@ public class UserService {
      * @throws UserException
      */
     public User getUser(String email) throws UserException {
-        logger.info("Logging from GET USER service method");
+        logger.info("Entering GET USER service method");
         try {
             long startTime = System.currentTimeMillis();
             User user = userRepo.findByUsername(email);
@@ -84,7 +84,7 @@ public class UserService {
      * @throws UserException
      */
     public User putUser(String email, User user) throws UserException {
-        logger.info("Logging from UPDATE USER service method");
+        logger.info("Entering PUT USER service method");
         if (null != user.getAccount_updated() || null != user.getAccount_created()) {
             throw new UserException("Put Request should not contain account_updated or account_created fields");
         }
@@ -101,7 +101,7 @@ public class UserService {
                 savedUser.setFirst_name(user.getFirst_name());
                 long startTime = System.currentTimeMillis();
                 User u = userRepo.save(savedUser);
-                statsd.recordExecutionTime("DB ResponseTime - UPDATE USER", System.currentTimeMillis() - startTime);
+                statsd.recordExecutionTime("DB ResponseTime - PUT USER", System.currentTimeMillis() - startTime);
                 return u;
             }else{
                 throw new UserException(CustomStrings.user_not_found);
@@ -119,11 +119,11 @@ public class UserService {
      * @throws UserException
      */
     public User getUnknownUser(String id) throws UserException {
-        logger.info("Logging from GET USER BY ID service method");
+        logger.info("Logging from GET USER_BY_ID service method");
         try {
             long startTime = System.currentTimeMillis();
             Optional<User> optional = userRepo.findById(id);
-            statsd.recordExecutionTime("DB ResponseTime - GET USER BY ID", System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("DB ResponseTime - GET USER_BY_ID", System.currentTimeMillis() - startTime);
             if (optional.isPresent())
                 return optional.get();
             else

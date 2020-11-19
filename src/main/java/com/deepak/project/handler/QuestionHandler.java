@@ -44,13 +44,13 @@ public class QuestionHandler {
     @PostMapping("/v1/question")
     public ResponseEntity<Question> postQuestion(@RequestBody @Valid @NotNull Question question,
                                                  Principal principal) throws QuestionException {
-        logger.info("Logging from POST /v1/question controller method");
+        logger.info("Entering POST QUESTION controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - POST /v1/question");
+        statsd.increment("Traffic - POST QUESTION");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         Question q = questionService.createQuestion(question, userId);
-        statsd.recordExecutionTime("ResponseTime - POST /v1/question",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - POST QUESTION",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.CREATED).body(q);
     }
 
@@ -65,13 +65,13 @@ public class QuestionHandler {
     @PutMapping("/v1/question/{question_id}")
     public ResponseEntity editAQuestion(@RequestBody @Valid @NotNull Question question, @PathVariable("question_id") String question_id,
                                         Principal principal) throws QuestionException {
-        logger.info("Logging from PUT /v1/question/{question_id} controller method");
+        logger.info("Entering PUT QUESTION controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - PUT /v1/question/{question_id}");
+        statsd.increment("Traffic - PUT QUESTION");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         questionService.editQuestion(validateQuestion(question), question_id, userId);
-        statsd.recordExecutionTime("ResponseTime - PUT /v1/question/{question_id}",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - PUT QUESTION",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -85,13 +85,13 @@ public class QuestionHandler {
     @DeleteMapping("/v1/question/{question_id}")
     public ResponseEntity deleteAQuestion(@PathVariable("question_id") @NotNull String question_id,
                                           Principal principal) throws QuestionException {
-        logger.info("Logging from DELETE /v1/question/{question_id} controller method");
+        logger.info("Entering DELETE QUESTION controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - DELETE /v1/question/{question_id}");
+        statsd.increment("Traffic - DELETE QUESTION");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         questionService.deleteQuestion(question_id, userId);
-        statsd.recordExecutionTime("ResponseTime - DELETE /v1/question/{question_id}",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - DELETE QUESTION",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -107,15 +107,15 @@ public class QuestionHandler {
     public ResponseEntity<Answer> answerAQuestion(@RequestBody @Valid @NotNull Answer answer,
                                                   @PathVariable("question_id") @NotNull String question_id,
                                                   Principal principal) throws QuestionException {
-        logger.info("Logging from POST /v1/question/{question_id} controller method");
+        logger.info("Entering POST ANSWER controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - POST /v1/question/{question_id}");
+        statsd.increment("Traffic - POST ANSWER");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         String answer_text = answer.getAnswer_text();
         if (null != answer_text && !answer_text.isEmpty()) {
             Answer ans = questionService.answerQuestion(question_id, userId, answer_text);
-            statsd.recordExecutionTime("ResponseTime - POST /v1/question/{question_id}",System.currentTimeMillis() - startTime);
+            statsd.recordExecutionTime("Total ResponseTime - POST ANSWER",System.currentTimeMillis() - startTime);
             return ResponseEntity.status(HttpStatus.CREATED).body(ans);
         }
         else throw new QuestionException("Invalid Answer");
@@ -135,14 +135,14 @@ public class QuestionHandler {
                                                  @PathVariable("answer_id") @NotNull String answer_id,
                                                  @PathVariable("question_id") @NotNull String question_id,
                                                  Principal principal) throws QuestionException {
-        logger.info("Logging from PUT /v1/question/{id}/answer/{id} controller method");
+        logger.info("Entering PUT ANSWER controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - PUT /v1/question/{id}/answer/{id}");
+        statsd.increment("Traffic - PUT ANSWER");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         String answer_text = answer.getAnswer_text();
         questionService.updateAnswer(question_id, answer_id, answer_text, userId);
-        statsd.recordExecutionTime("ResponseTime - PUT /v1/question/{id}/answer/{id}",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - PUT ANSWER",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -158,13 +158,13 @@ public class QuestionHandler {
     public ResponseEntity deleteAnAnswer(@PathVariable("answer_id") @NotNull String answer_id,
                                          @PathVariable("question_id") @NotNull String question_id,
                                          Principal principal) throws QuestionException {
-        logger.info("Logging from DELETE /v1/question/{id}/answer/{id} controller method");
+        logger.info("Entering DELETE ANSWER controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - DELETE /v1/question/{id}/answer/{id}");
+        statsd.increment("Traffic - DELETE ANSWER");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         questionService.deleteAnswer(answer_id, question_id, userId);
-        statsd.recordExecutionTime("ResponseTime - DELETE /v1/question/{id}/answer/{id}",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - DELETE ANSWER",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -176,11 +176,11 @@ public class QuestionHandler {
      */
     @GetMapping("/v1/question/{question_id}")
     public ResponseEntity<Question> getAQuestion(@PathVariable("question_id") @NotNull String question_id) throws QuestionException {
-        logger.info("Logging from GET /v1/question/{id} controller method");
+        logger.info("Entering GET QUESTION controller method");
         long startTime = System.currentTimeMillis();
         statsd.increment("Traffic - GET /v1/question/{id}");
         Question q = questionService.getQuestion(question_id);
-        statsd.recordExecutionTime("ResponseTime - GET /v1/question/{id}",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - GET QUESTION",System.currentTimeMillis() - startTime);
         return ResponseEntity.ok(q);
     }
 
@@ -191,10 +191,10 @@ public class QuestionHandler {
      */
     @GetMapping("/v1/questions")
     public ResponseEntity<List<Question>> getAllQuestions() throws QuestionException {
-        logger.info("Logging from GET /v1/questions controller method");
+        logger.info("Entering GET QUESTIONS controller method");
         long startTime = System.currentTimeMillis();
         statsd.increment("Traffic - GET /v1/questions");
-        statsd.recordExecutionTime("ResponseTime - GET /v1/questions",System.currentTimeMillis() - startTime);
+        statsd.recordExecutionTime("Total ResponseTime - GET QUESTIONS",System.currentTimeMillis() - startTime);
         return ResponseEntity.ok(questionService.getAllQuestions());
     }
 
@@ -208,10 +208,10 @@ public class QuestionHandler {
     @GetMapping("/v1/question/{question_id}/answer/{answer_id}")
     public ResponseEntity<Answer> getAnAnswer(@PathVariable("answer_id") @NotNull String answer_id,
                                               @PathVariable("question_id") @NotNull String question_id) throws QuestionException {
-        logger.info("Logging from GET /v1/question/{id}/answer/{id} controller method");
+        logger.info("Entering GET ANSWER controller method");
         long startTime = System.currentTimeMillis();
-        statsd.increment("Traffic - GET /v1/question/{id}/answer/{id}");
-        statsd.recordExecutionTime("ResponseTime - GET /v1/question/{id}/answer/{id}",System.currentTimeMillis() - startTime);
+        statsd.increment("Traffic - GET ANSWER");
+        statsd.recordExecutionTime("Total ResponseTime - GET ANSWER",System.currentTimeMillis() - startTime);
         return ResponseEntity.ok(questionService.getAnswer(answer_id));
     }
 
