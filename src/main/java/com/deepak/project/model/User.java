@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -25,6 +23,7 @@ public class User {
 
 
     @NotNull(message = "username has to be present")
+    @Column(unique = true)
     private String username;
     @ReadOnlyProperty
     private String account_created;
