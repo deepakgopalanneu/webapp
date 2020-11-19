@@ -14,4 +14,5 @@ public class CustomStrings {
     public static final String rds_delete_error = "Unable to delete File from RDS";
     public static final String rds_save_error = "Unable to save file data to RDS";
     public static final String s3_save_error = "Unable to save file to S3";
+    public static final String user_conflict = "Conflict - Email address already in use";
 }
