@@ -100,7 +100,10 @@ public class QuestionService {
                 else {
                     Category addCategory = new Category();
                     addCategory.setCategory(categoryName);
-                    categoryList.add(categoryRepo.save(addCategory));
+                    try {
+                        categoryList.add( categoryRepo.save(addCategory));
+                    }catch (Exception e){}
+
                 }
             });
             question.setCategories(categoryList);
@@ -190,7 +193,9 @@ public class QuestionService {
                         else {
                             Category addCategory = new Category();
                             addCategory.setCategory(categoryName);
-                            categoryList.add(categoryRepo.save(addCategory));
+                            try {
+                                categoryList.add( categoryRepo.save(addCategory));
+                            }catch (Exception e){}
                         }
                     });
                     q.setCategories(categoryList);

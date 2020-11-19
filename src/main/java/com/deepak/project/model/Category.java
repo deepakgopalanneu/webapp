@@ -2,6 +2,7 @@ package com.deepak.project.model;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,6 +18,7 @@ public class Category {
 
     @NotNull(message = "category has to be present")
     @NotBlank(message = "category has to be present")
+    @Column(unique = true)
     private String category;
 
     public String getCategory_id() {
