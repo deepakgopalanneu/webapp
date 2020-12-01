@@ -1,4 +1,4 @@
-version: 0.0
+ee  G w version: 0.0
 os: linux
 
 files:
@@ -13,11 +13,3 @@ hooks:
     - location: ./codedeploy/applicationStop.sh
       timeout: 180
       runas: ubuntu
-#  AfterInstall:
-#    - location: server/afterInstall.sh
-#      timeout: 120
-#      runas: ubuntu
-#  ValidateService:
-#    - location: ./codedeploy/validate.sh
-#      timeout: 120
-#      runas: ubuntu

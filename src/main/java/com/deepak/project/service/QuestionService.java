@@ -1,5 +1,8 @@
 package com.deepak.project.service;
 
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.deepak.project.Exception.FileException;
 import com.deepak.project.Exception.QuestionException;
 import com.deepak.project.model.Answer;
@@ -36,14 +39,15 @@ public class QuestionService {
     FileService fileService;
     private final static Logger logger = LoggerFactory.getLogger(QuestionService.class);
     StatsDClient statsd;
-
+    SNSService snsService;
     @Autowired
-    public QuestionService(QuestionRepository questionRepo, CategoryRepository categoryRepo, AnswerRepository answerRepo, FileService fileService, StatsDClient statsd) {
+    public QuestionService(QuestionRepository questionRepo, CategoryRepository categoryRepo, AnswerRepository answerRepo, FileService fileService, StatsDClient statsd,SNSService snsService) {
         this.questionRepo = questionRepo;
         this.categoryRepo = categoryRepo;
         this.answerRepo = answerRepo;
         this.fileService = fileService;
         this.statsd = statsd;
+        this.snsService=snsService;
     }
 
     /**
@@ -421,4 +425,6 @@ public class QuestionService {
             throw new QuestionException(e.getMessage());
         }
     }
+
+
 }
