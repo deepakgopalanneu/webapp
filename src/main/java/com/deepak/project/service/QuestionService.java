@@ -132,7 +132,7 @@ public class QuestionService {
      * @return
      * @throws QuestionException
      */
-    public Answer answerQuestion(String question_id, String userId, String answer_text) throws QuestionException {
+    public Answer answerQuestion(String question_id, String userId, String answer_text, String userEmail) throws QuestionException {
         logger.info("Entering POST ANSWER service method");
         Answer answer = new Answer();
         answer.setAnswer_text(answer_text);
@@ -287,7 +287,7 @@ public class QuestionService {
      * @param userId
      * @throws QuestionException
      */
-    public void updateAnswer(String question_id, String answer_id, String answer_text, String userId) throws QuestionException {
+    public void updateAnswer(String question_id, String answer_id, String answer_text, String userId, String userEmail) throws QuestionException {
         logger.info("Entering PUT ANSWER service method");
         try {
             Optional<Question> questOptional = questionRepo.findById(question_id);
@@ -330,7 +330,7 @@ public class QuestionService {
      * @param userId
      * @throws QuestionException
      */
-    public void deleteAnswer(String answer_id, String question_id, String userId) throws QuestionException {
+    public void deleteAnswer(String answer_id, String question_id, String userId, String userEmail) throws QuestionException {
         logger.info("Entering DELETE ANSWER service method");
         try {
             Optional<Question> questOptional = questionRepo.findById(question_id);
