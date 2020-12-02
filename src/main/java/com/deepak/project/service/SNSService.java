@@ -23,17 +23,18 @@ public class SNSService {
     private AmazonSNS sns;
     private CreateTopicResult topic;
     private final static Logger logger = LoggerFactory.getLogger(SNSService.class);
-
+    String topicArn;
     @Autowired
     public SNSService(){
         InstanceProfileCredentialsProvider provider = new InstanceProfileCredentialsProvider(true);
         this.sns =  AmazonSNSClientBuilder.standard().withCredentials(provider).withRegion(region).build();
         this.topic = sns.createTopic("TOPIC_EMAIL");
+        topicArn=topic.getTopicArn();
     }
 
     public boolean postToSNSTopic(String questionId, String answerId, String destinationEmail ){
         try {
-            PublishRequest request = new PublishRequest(topic.getTopicArn(), formatMessageBody(questionId,answerId,destinationEmail));
+            PublishRequest request = new PublishRequest(topicArn, formatMessageBody(questionId,answerId,destinationEmail));
             PublishResult result = sns.publish(request);
             logger.info("Published to SNS Topic! The Message ID was : "+ result.getMessageId() + "| Status was " + result.getSdkHttpMetadata().getHttpStatusCode());
             return true;
@@ -45,22 +46,15 @@ public class SNSService {
 
     public String formatMessageBody(String questionId, String answerId, String destinationEmail) {
         StringBuilder message = new StringBuilder();
-        message.append("destination :");
         message.append(destinationEmail);
         message.append("|");
-        message.append("QuestionId :");
         message.append(questionId);
         message.append("|");
-        message.append("AnswerId :");
         message.append(answerId);
         message.append("|");
-        message.append("Question Link : http://prod.deepakgopalan.me/v1/question/");
-        message.append(questionId);
+        message.append("Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId);
         message.append("|");
-        message.append("Answer Link : http://prod.deepakgopalan.me/v1/question/");
-        message.append(questionId);
-        message.append("/answer/");
-        message.append(answerId);
+        message.append("Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId);
         return message.toString();
     }
 }
