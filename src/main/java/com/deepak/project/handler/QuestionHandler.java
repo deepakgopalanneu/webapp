@@ -114,7 +114,7 @@ public class QuestionHandler {
         String userId = userPrincipal.getId();
         String answer_text = answer.getAnswer_text();
         if (null != answer_text && !answer_text.isEmpty()) {
-            Answer ans = questionService.answerQuestion(question_id, userId, answer_text);
+            Answer ans = questionService.answerQuestion(question_id, userId, answer_text,userPrincipal.getUsername());
             statsd.recordExecutionTime("Total ResponseTime - POST ANSWER",System.currentTimeMillis() - startTime);
             return ResponseEntity.status(HttpStatus.CREATED).body(ans);
         }
@@ -141,7 +141,7 @@ public class QuestionHandler {
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
         String answer_text = answer.getAnswer_text();
-        questionService.updateAnswer(question_id, answer_id, answer_text, userId);
+        questionService.updateAnswer(question_id, answer_id, answer_text, userId,userPrincipal.getUsername());
         statsd.recordExecutionTime("Total ResponseTime - PUT ANSWER",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -163,7 +163,7 @@ public class QuestionHandler {
         statsd.increment("Traffic - DELETE ANSWER");
         UserPrincipal userPrincipal = (UserPrincipal) ((Authentication) principal).getPrincipal();
         String userId = userPrincipal.getId();
-        questionService.deleteAnswer(answer_id, question_id, userId);
+        questionService.deleteAnswer(answer_id, question_id, userId,userPrincipal.getUsername());
         statsd.recordExecutionTime("Total ResponseTime - DELETE ANSWER",System.currentTimeMillis() - startTime);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
