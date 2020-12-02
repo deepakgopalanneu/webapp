@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SNSService {
 
-    @Value("${cloud.aws.s3.region}")
+    @Value("${cloud.aws.region}")
     private String region;
     private AmazonSNS sns;
     private CreateTopicResult topic;
