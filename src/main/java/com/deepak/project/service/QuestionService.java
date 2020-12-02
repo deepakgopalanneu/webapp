@@ -147,7 +147,7 @@ public class QuestionService {
             if (q.isPresent()) {
                 Answer ans = answerRepo.save(answer);
                 statsd.recordExecutionTime("DB ResponseTime - POST ANSWER", System.currentTimeMillis() - startTime);
-                snsService.postToSNSTopic(question_id,ans.getAnswer_id(),userEmail);
+                snsService.postToSNSTopic(question_id,ans.getAnswer_id(),userEmail,ans.getAnswer_text());
                 return ans;
             } else
                 throw new QuestionException(CustomStrings.not_found);
@@ -304,7 +304,7 @@ public class QuestionService {
                         ans.setUpdated_timestamp(LocalDateTime.now().toString());
                         long startTime = System.currentTimeMillis();
                         answerRepo.save(ans);
-                        snsService.postToSNSTopic(question_id,ans.getAnswer_id(),userEmail);
+                        snsService.postToSNSTopic(question_id,ans.getAnswer_id(),userEmail,ans.getAnswer_text());
                         statsd.recordExecutionTime("DB ResponseTime - PUT ANSWER", System.currentTimeMillis() - startTime);
 
                     }
@@ -347,7 +347,7 @@ public class QuestionService {
                             deleteImagesFromS3(ans.getAttachments());
                         long startTime = System.currentTimeMillis();
                         answerRepo.deleteById(ans.getAnswer_id());
-                        snsService.postToSNSTopic(question_id,ans.getAnswer_id(),userEmail);
+                        snsService.postToSNSTopic(question_id,ans.getAnswer_id(),userEmail,ans.getAnswer_text());
                         statsd.recordExecutionTime("DB ResponseTime - DELETE ANSWER", System.currentTimeMillis() - startTime);
              }
                 } else {
