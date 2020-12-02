@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
+
 @Service
 public class SNSService {
 
@@ -45,7 +47,8 @@ public class SNSService {
     }
 
     public String formatMessageBody(String questionId, String answerId, String destinationEmail, String answerBody) {
-        int itemKey = (questionId+answerId+destinationEmail+answerBody).hashCode();
+
+        String itemKey = Base64.getEncoder().encodeToString((questionId+answerId+destinationEmail+answerBody).getBytes());
         return (destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+
                 "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId + ","+ answerBody+ ","+itemKey);
 
