@@ -48,7 +48,7 @@ public class SNSService {
 
     public String formatMessageBody(String questionId, String answerId, String destinationEmail, String answerBody) {
 
-        String itemKey = Base64.getEncoder().encodeToString((questionId+answerId+destinationEmail+answerBody).getBytes());
+        String itemKey = Base64.getEncoder().encodeToString((questionId+destinationEmail+answerBody).getBytes());
         return (destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+
                 "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId + ","+ answerBody+ ","+itemKey);
 
