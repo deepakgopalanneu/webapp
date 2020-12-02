@@ -32,9 +32,9 @@ public class SNSService {
         topicArn=topic.getTopicArn();
     }
 
-    public boolean postToSNSTopic(String questionId, String answerId, String destinationEmail ){
+    public boolean postToSNSTopic(String questionId, String answerId, String destinationEmail , String answerBody){
         try {
-            PublishRequest request = new PublishRequest(topicArn, formatMessageBody(questionId,answerId,destinationEmail));
+            PublishRequest request = new PublishRequest(topicArn, formatMessageBody(questionId,answerId,destinationEmail,answerBody));
             PublishResult result = sns.publish(request);
             logger.info("Published to SNS Topic! The Message ID was : "+ result.getMessageId() + "| Status was " + result.getSdkHttpMetadata().getHttpStatusCode());
             return true;
@@ -44,9 +44,10 @@ public class SNSService {
         }
     }
 
-    public String formatMessageBody(String questionId, String answerId, String destinationEmail) {
+    public String formatMessageBody(String questionId, String answerId, String destinationEmail, String answerBody) {
+        int itemKey = (questionId+answerId+destinationEmail+answerBody).hashCode();
         return (destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+
-                "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId);
+                "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId + ","+ answerBody+ ","+itemKey);
 
     }
 }
