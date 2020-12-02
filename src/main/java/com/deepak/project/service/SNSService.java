@@ -45,16 +45,8 @@ public class SNSService {
     }
 
     public String formatMessageBody(String questionId, String answerId, String destinationEmail) {
-        StringBuilder message = new StringBuilder();
-        message.append(destinationEmail);
-        message.append("|");
-        message.append(questionId);
-        message.append("|");
-        message.append(answerId);
-        message.append("|");
-        message.append("Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId);
-        message.append("|");
-        message.append("Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId);
-        return message.toString();
+        return (destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+
+                "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId);
+
     }
 }
