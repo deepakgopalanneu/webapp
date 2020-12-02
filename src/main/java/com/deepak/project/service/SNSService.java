@@ -3,7 +3,6 @@ package com.deepak.project.service;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.AmazonSNSException;
 import com.amazonaws.services.sns.model.CreateTopicResult;
@@ -26,6 +25,11 @@ public class SNSService {
     private CreateTopicResult topic;
     private final static Logger logger = LoggerFactory.getLogger(SNSService.class);
     String topicArn;
+    enum operation{
+        POST,
+        PUT,
+        DELETE
+    }
     @Autowired
     public SNSService(){
         InstanceProfileCredentialsProvider provider = new InstanceProfileCredentialsProvider(true);
@@ -34,9 +38,9 @@ public class SNSService {
         topicArn=topic.getTopicArn();
     }
 
-    public boolean postToSNSTopic(String questionId, String answerId, String destinationEmail , String answerBody){
+    public boolean postToSNSTopic(String questionId, String answerId, String destinationEmail , String answerBody , operation scenario){
         try {
-            PublishRequest request = new PublishRequest(topicArn, formatMessageBody(questionId,answerId,destinationEmail,answerBody));
+            PublishRequest request = new PublishRequest(topicArn, formatMessageBody(questionId,answerId,destinationEmail,answerBody, scenario));
             PublishResult result = sns.publish(request);
             logger.info("Published to SNS Topic! The Message ID was : "+ result.getMessageId() + "| Status was " + result.getSdkHttpMetadata().getHttpStatusCode());
             return true;
@@ -46,11 +50,25 @@ public class SNSService {
         }
     }
 
-    public String formatMessageBody(String questionId, String answerId, String destinationEmail, String answerBody) {
+    public String formatMessageBody(String questionId, String answerId, String destinationEmail, String answerBody, operation scenario) {
+        switch(scenario) {
+            case PUT:
+                String itemKey = Base64.getEncoder().encodeToString((questionId+destinationEmail+answerBody).getBytes());
+                return ("PUT,"+destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+
+                        "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId + ","+ answerBody+ ","+itemKey);
+            case POST:
+                String itemKey1 = Base64.getEncoder().encodeToString((questionId+destinationEmail+answerBody).getBytes());
+                return ("POST,"+destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+
+                        "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId + ","+ answerBody+ ","+itemKey1);
 
-        String itemKey = Base64.getEncoder().encodeToString((questionId+destinationEmail+answerBody).getBytes());
-        return (destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+
-                "Answer Link : http://prod.deepakgopalan.me/v1/question/"+questionId+"/answer/"+answerId + ","+ answerBody+ ","+itemKey);
+            case DELETE:
+                String itemKey2 = Base64.getEncoder().encodeToString((questionId+destinationEmail).getBytes());
+                return ("DELETE,"+destinationEmail +","+questionId+","+answerId+","+"Question Link : http://prod.deepakgopalan.me/v1/question/"+questionId+","+itemKey2);
+
+            default:
+                return " ";
+        }
+
 
     }
 }
