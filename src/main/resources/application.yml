@@ -12,7 +12,7 @@ spring:
       max-file-size: 2MB
       max-request-size: 2MB
   datasource:
-    url: jdbc:mysql://${DATASOURCE_URL}/${DB_NAME}?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: jdbc:mysql://${DATASOURCE_URL}/${DB_NAME}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
