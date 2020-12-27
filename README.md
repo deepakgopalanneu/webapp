@@ -1,5 +1,8 @@
 # Webapp   
 
+## Architecture
+
+![architecture](./Cloud%20Architecture.jpeg)
 ## Prerequisites to this webapp
 
 1. Create AWS account and user with access to required resources
